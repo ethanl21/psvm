@@ -10,6 +10,7 @@ await esbuild
     bundle: true,
     outfile: "dist/psvm.js",
     format: "esm",
+    treeShaking: false,
     define: {
       global: "globalThis",
     },
