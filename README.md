@@ -3,7 +3,7 @@
 PSVM is Pokemon Showdown's simulator with no runtime dependencies (Node.js).
 
 > **Warning**  
-PSVM is still under construction, and not currently usable for its intended purpose.
+PSVM is still under construction and is not currently usable for its intended purpose.
 
 ### Details
 PSVM consists of [Smogon's Pokemon Showdown battle engine](https://github.com/smogon/pokemon-showdown) bundled by [esbuild](https://esbuild.github.io) for [QuickJS](https://github.com/bellard/quickjs).
