@@ -1,5 +1,7 @@
 CC = clang
+CPP = clang++
 CFLAGS = -I$(LIB_DIR)/quickjs -I$(INCLUDE_DIR)
+CPPFLAGS = --std=c++20
 
 LIB_DIR = ./lib
 JS_DIST_DIR = ./psvmjs/dist
@@ -12,7 +14,7 @@ DIST_DIR = ./dist
 all: psvm
 
 psvm: psvm-js.h | $(DIST_DIR)
-	$(CC) $(CFLAGS) -o $(DIST_DIR)/psvm  $(SRC_DIR)/psvm.c $(LIB_DIR)/quickjs/libquickjs.a
+	$(CPP) $(CFLAGS) $(CPPFLAGS) -o $(DIST_DIR)/psvm $(SRC_DIR)/psvm.cpp $(SRC_DIR)/test_driver.cpp $(LIB_DIR)/quickjs/libquickjs.a
  
 psvm-js.h: quickjs | $(INCLUDE_DIR)
 	./$(LIB_DIR)/quickjs/qjsc -c -o $(INCLUDE_DIR)/psvm-js.h $(JS_DIST_DIR)/globalize.js
