@@ -1,7 +1,9 @@
-import { BattleStreams } from "@pkmn/sim";
-import { WriteStream } from "@pkmn/streams";
+// @ts-ignore
+import {BattleStreams} from "@pkmn/sim";
+import {WriteStream} from "@pkmn/streams";
 
 type onResponseFunctionType = (chunk: string) => void;
+
 export class ShowdownSimulator {
   streams: ReturnType<typeof BattleStreams.getPlayerStreams>;
   onResponseOmniscient: onResponseFunctionType | undefined;
@@ -9,15 +11,17 @@ export class ShowdownSimulator {
 
   constructor() {
     this.streams = BattleStreams.getPlayerStreams(
-      new BattleStreams.BattleStream({ keepAlive: true })
+      new BattleStreams.BattleStream({keepAlive: true})
     );
 
-    this.output = new Array();
+    this.output = [];
 
     void (async () => {
       for await (const chunk of this.streams.omniscient) {
-        //this.onResponseOmniscient && this.onResponseOmniscient(chunk);
-        chunk.split("\n").forEach((line) => this.output.push(line));
+        console.log(chunk);
+        chunk.split("\n").forEach((line: string) => {
+          this.output.push(line);
+        });
       }
     })();
   }
@@ -27,9 +31,10 @@ export class ShowdownSimulator {
       chunk += "\n";
     }
 
-    await this.streams.omniscient.write(chunk);
+    return this.streams.omniscient.write(chunk);
   }
 }
 
 import * as TextEncoding from "@zxing/text-encoding";
-export { TextEncoding };
+
+export {TextEncoding};

@@ -1,3 +1,5 @@
 dist
 include/psvm-js.h
 .vscode
+.idea
+cmake-build-debug

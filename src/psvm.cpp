@@ -1,24 +1,20 @@
 #include "psvm.hpp"
 
-ShowdownRuntime::ShowdownRuntime()
-{
+ShowdownRuntime::ShowdownRuntime() {
     // Create pipes
-    if (pipe(this->parent_to_child) == -1 || pipe(this->child_to_parent) == -1)
-    {
+    if (pipe(this->parent_to_child) == -1 || pipe(this->child_to_parent) == -1) {
         perror("pipe");
         exit(EXIT_FAILURE); // todo exceptions instead of exit
     }
 
     // Fork process
     this->child_pid = fork();
-    if (this->child_pid == -1)
-    {
+    if (this->child_pid == -1) {
         perror("fork");
         exit(EXIT_FAILURE); // todo exceptions instead of exit
     }
 
-    if (this->child_pid == 0)
-    {
+    if (this->child_pid == 0) {
         // inside child
         this->isParent = false;
 
@@ -35,7 +31,7 @@ ShowdownRuntime::ShowdownRuntime()
         // Create the simulator
         JS_Eval(this->ctx, CREATE_SIM_JS.c_str(), CREATE_SIM_JS.size(), "<module>", JS_EVAL_TYPE_MODULE);
 
-        // Setup the simulator
+        // Set up the simulator
         JS_Eval(this->ctx, SETUP_SIM_JS.c_str(), SETUP_SIM_JS.size(), "<module>", JS_EVAL_TYPE_MODULE);
 
         // JS runtime event loop
@@ -43,9 +39,7 @@ ShowdownRuntime::ShowdownRuntime()
 
         JS_FreeContext(this->ctx);
         JS_FreeRuntime(this->rt);
-    }
-    else
-    {
+    } else {
         // inside parent
         this->isParent = true;
 
@@ -55,68 +49,53 @@ ShowdownRuntime::ShowdownRuntime()
     }
 }
 
-ShowdownRuntime::~ShowdownRuntime()
-{
+ShowdownRuntime::~ShowdownRuntime() {
     // Clean up
-    if (this->isParent)
-    {
+    if (this->isParent) {
         close(this->parent_to_child[1]);
         close(this->child_to_parent[0]);
-
-        wait(NULL);
-    }
-    else
-    {
+    } else {
         close(this->parent_to_child[0]);
         close(this->child_to_parent[1]);
     }
 }
 
-void ShowdownRuntime::insert(std::string &input)
-{
-    if (!this->isParent)
-    {
+void ShowdownRuntime::insert(std::string &input) {
+    if (!this->isParent) {
         return;
     }
 
-    // std::cout << "writing: " << input.substr(0, 10) << "..."
-    //           << "\n";
     ssize_t bytesWritten = write(this->parent_to_child[1], input.c_str(), strlen(input.c_str()) + 1);
 
-    if (bytesWritten == -1)
-    {
+    if (bytesWritten == -1) {
         perror("write");
         exit(1); // todo exceptions instead of exit
     }
 }
 
-std::optional<std::string> ShowdownRuntime::readResult()
-{
-    if (!this->isParent)
-    {
+std::optional<std::string> ShowdownRuntime::readResult() {
+    if (!this->isParent) {
         return {};
     }
 
     char buffer[1024];
     ssize_t bytes_read = read(this->child_to_parent[0], buffer, sizeof(buffer));
 
-    switch (bytes_read)
-    {
-    case -1:
-        perror("read");
-        exit(1); // todo exception
-        break;
-    case 0:
-        return {};
-    default:
-        return std::string(buffer, bytes_read-1); // trim null terminator
+    switch (bytes_read) {
+        case -1:
+            perror("read");
+            exit(1); // todo exception
+            break;
+        case 0:
+            return {};
+        default:
+            return std::string(buffer, bytes_read - 1);
     }
 
     return {};
 }
 
-JSContext *ShowdownRuntime::JS_NewCustomContext(JSRuntime *rt)
-{
+JSContext *ShowdownRuntime::JS_NewCustomContext(JSRuntime *rt) {
     JSContext *ctx = JS_NewContextRaw(rt);
     if (!ctx)
         return nullptr;
@@ -147,4 +126,10 @@ JSContext *ShowdownRuntime::JS_NewCustomContext(JSRuntime *rt)
 
     JS_FreeValue(ctx, global_obj);
     return ctx;
+}
+
+void ShowdownRuntime::wait_for_child() {
+    if (this->isParent) {
+        wait(NULL);
+    }
 }
