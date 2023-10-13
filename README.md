@@ -1,4 +1,5 @@
 # PSVM
+[![Documentation Status](https://readthedocs.org/projects/psvm/badge/?version=latest)](https://psvm.readthedocs.io/en/latest/?badge=latest)
 
 PSVM is Pokémon Showdown's simulator compiled to native code with no runtime dependencies.
 
