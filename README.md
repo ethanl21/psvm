@@ -27,24 +27,26 @@ git clone --recursive https://github.com/ethanl21/psvm
 cd psvm
 
 # build quickjs
-cd ./lib/quickjs
+cd ./src/lib/quickjs
 make libquickjs.lto.a libquickjs.a qjsc
 
 # build the JavaScript bundle
+# (in the root directory)
 cd psvmjs
 pnpm i
 pnpm build
 
 # compile the JavaScript bundle to bytecode
-cd ..
-./lib/quickjs/qjsc -c -o ./include/psvmjs.c  ./psvmjs/dist/globalize.js
+# (in the root directory)
+./psvm/lib/quickjs/qjsc -c -o ./psvm/src/psvmjs.c ./psvmjs/dist/globalize.js 
 
 # build psvm (requires vcpkg)
+# (in the root directory)
 cmake -B [build directory] -S . -DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
 cmake --build [build directory]
 ```
 
-The compiled executable will be located at ``[build directory]/psvm``.
+A compiled test driver executable will be located at ``[build directory]/psvm/test/psvm_test``.
 
 ## Attribution
 

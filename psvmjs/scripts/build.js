@@ -4,6 +4,7 @@ import * as esbuild from "esbuild";
 import pkg from '@sprout2000/esbuild-copy-plugin';
 const { copyPlugin } = pkg;
 
+// noinspection JSUnresolvedReference
 await esbuild
   .build({
     entryPoints: ["src/main.ts"],
