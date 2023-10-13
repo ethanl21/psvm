@@ -14,9 +14,6 @@ dependencies:
   '@pkmn/streams':
     specifier: ^1.1.0
     version: 1.1.0
-  '@zxing/text-encoding':
-    specifier: ^0.9.0
-    version: 0.9.0
 
 devDependencies:
   '@sprout2000/esbuild-copy-plugin':
@@ -257,10 +254,6 @@ packages:
     resolution: {integrity: sha512-ceg8Cutl2I7IO+iCweVR8EIwlttSSbQjfMS5NzidYWjy3+oAVCua3AdYXe2c0PaMN5QllytIt+SAO7gFODT8lw==}
     engines: {node: '>=16.7'}
     dev: true
-
-  /@zxing/text-encoding@0.9.0:
-    resolution: {integrity: sha512-U/4aVJ2mxI0aDNI8Uq0wEhMgY+u4CNtEb0om3+y3+niDAsoTCOB33UF0sxpzqzdqXLqmvc+vZyAt4O8pPdfkwA==}
-    dev: false
 
   /esbuild@0.19.4:
     resolution: {integrity: sha512-x7jL0tbRRpv4QUyuDMjONtWFciygUxWaUM1kMX2zWxI0X2YWOt7MSA0g4UdeSiHM8fcYVzpQhKYOycZwxTdZkA==}

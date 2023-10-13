@@ -1,36 +1,61 @@
 # PSVM
 
-PSVM is Pokemon Showdown's simulator with no runtime dependencies (Node.js).
+PSVM is Pokémon Showdown's simulator compiled to native code with no runtime dependencies.
 
 > **Warning**  
-PSVM is still under construction and is not currently usable for its intended purpose.
+> PSVM is still under construction and is not currently usable for its intended purpose.
+>
+> PSVM currently cannot be compiled on Windows.
 
 ### Details
-PSVM consists of [Smogon's Pokemon Showdown battle engine](https://github.com/smogon/pokemon-showdown) bundled by [esbuild](https://esbuild.github.io) for [QuickJS](https://github.com/bellard/quickjs).
 
-PSVM is intended to be used as a battle engine for Pokemon fangames, similar to Essentials' PBS. It has no runtime dependencies and isn't dependent on any particular engine, so it should be easy enough to add to any game engine that supports native C++ modules. An example Godot 4 integration is planned.
+PSVM consists of [Smogon's Pokémon Showdown battle engine](https://github.com/smogon/pokemon-showdown) bundled
+by [esbuild](https://esbuild.github.io) for [QuickJS](https://github.com/bellard/quickjs).
+
+PSVM is intended to be used as a battle engine for Pokémon fangames, similar to Essentials' PBS. It has no runtime
+dependencies and isn't dependent on any particular engine, so it should be easy enough to add to any game engine that
+supports native C++ modules. An example Godot 4 integration is planned.
 
 ## Building
-To build PSVM, Node.js and a C/C++ compiler are required. The provided makefile uses ``clang``, but ``gcc`` should also be sufficient.
+
+To build PSVM, Node.js, CMake, and vcpkg are required. (better CMake workflow wip)
+
+To build the test driver program:
 
 ```bash
-git clone https://github.com/ethanl21/psvm
+git clone --recursive https://github.com/ethanl21/psvm
 cd psvm
 
-# build the JavaScript Bundle
+# build quickjs
+cd ./src/lib/quickjs
+make libquickjs.lto.a libquickjs.a qjsc
+
+# build the JavaScript bundle
+# (in the root directory)
 cd psvmjs
 pnpm i
 pnpm build
 
-# build PSVM
-cd ..
-make all
+# compile the JavaScript bundle to bytecode
+# (in the root directory)
+./psvm/lib/quickjs/qjsc -c -o ./psvm/src/psvmjs.c ./psvmjs/dist/globalize.js 
+
+# build psvm (requires vcpkg)
+# (in the root directory)
+cmake -B [build directory] -S . -DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
+cmake --build [build directory]
 ```
-The compiled executable will be located at ``dist/psvm``.
+
+A compiled test driver executable will be located at ``[build directory]/psvm/test/psvm_test``.
 
 ## Attribution
-PSVM uses [pkmn/ps](https://github.com/pkmn/ps) (a modular version of [smogon/pokemon-showdown](https://github.com/smogon/pokemon-showdown)) to simulate battles. Both are distributed under the MIT license.
 
-PSVM uses [bellard/quickjs](https://github.com/bellard/quickjs) as its JavaScript runtime, which is distributed under the MIT license.
+PSVM uses [pkmn/ps](https://github.com/pkmn/ps) (a modular version
+of [smogon/pokemon-showdown](https://github.com/smogon/pokemon-showdown)) to simulate battles. Both are distributed
+under the MIT license.
+
+[bellard/quickjs](https://github.com/bellard/quickjs) is distributed under the MIT license.
+
+[boostorg/uuid](https://github.com/boostorg/uuid) is distributed under the BSL-1.0 license.
 
 PSVM itself is distributed under the [GPL-3.0-Only](https://choosealicense.com/licenses/gpl-3.0/) license.
