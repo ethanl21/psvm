@@ -1,3 +1,4 @@
 [submodule "lib/quickjs"]
 	path = psvm/lib/quickjs
 	url = https://github.com/bellard/quickjs
+	ignore = all
