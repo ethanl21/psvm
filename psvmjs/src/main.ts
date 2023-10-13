@@ -1,40 +1,46 @@
 // @ts-ignore
-import {BattleStreams} from "@pkmn/sim";
-import {WriteStream} from "@pkmn/streams";
+import { BattleStreams } from "@pkmn/sim";
+import { ObjectReadWriteStream } from "@pkmn/streams";
 
-type onResponseFunctionType = (chunk: string) => void;
-
-export class ShowdownSimulator {
-  streams: ReturnType<typeof BattleStreams.getPlayerStreams>;
-  onResponseOmniscient: onResponseFunctionType | undefined;
-  output: string[];
+export class ShowdownService {
+  battle_dict: Map<string, ObjectReadWriteStream<string>>;
 
   constructor() {
-    this.streams = BattleStreams.getPlayerStreams(
-      new BattleStreams.BattleStream({keepAlive: true})
+    this.battle_dict = new Map();
+  }
+
+  startBattle(id: string) {
+    // Delete the battle stream if it already exists
+    this.battle_dict.delete(id);
+
+    // Create the battle streams
+    const streams = BattleStreams.getPlayerStreams(
+      new BattleStreams.BattleStream()
     );
 
-    this.output = [];
+    // Add the omniscient stream to the streams dict
+    this.battle_dict.set(id, streams.omniscient);
 
-    void (async () => {
-      for await (const chunk of this.streams.omniscient) {
-        console.log(chunk);
-        chunk.split("\n").forEach((line: string) => {
-          this.output.push(line);
-        });
+    // Write the output to the output function
+    void (async (id) => {
+      for await(const chunk of streams.omniscient) {
+        // todo add actual fn here
+        // @ts-ignore
+        ResponseCallback(id, chunk);
       }
-    })();
+    })(id);
   }
 
-  async writeToOmniscient(chunk: string) {
-    if (!chunk.endsWith("\n")) {
-      chunk += "\n";
-    }
+  writeToBattle(id: string, message: string) {
+    const battleStream = this.battle_dict.get(id);
 
-    return this.streams.omniscient.write(chunk);
+    if (battleStream) {
+      let msgCopy = message.slice();
+      if (!msgCopy.endsWith("\n")) {
+        msgCopy += "\n";
+      }
+
+      battleStream.write(msgCopy);
+    }
   }
 }
-
-import * as TextEncoding from "@zxing/text-encoding";
-
-export {TextEncoding};

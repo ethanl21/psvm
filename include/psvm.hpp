@@ -1,102 +1,71 @@
 #ifndef PSVM_HPP
 #define PSVM_HPP
 
-#include <iostream>
-#include <string>
-#include <optional>
-#include <vector>
-#include <unistd.h>
+#include <string>       // std::string
+#include <sstream>      // std::stringstream
+#include <optional>     // std::optional
+#include <functional>   // std::function
+
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
+#include "psvmjs.hpp" // compiled JS bytecode containing simulator wrapper class
+
+// wrap QuickJS in a namespace just in case
+namespace qjs {
+    extern "C"
+    {
+
 #include "quickjs-libc.h"
-#include "psvm-js.h"
+#include "quickjs.h"
 
-const std::string CREATE_SIM_JS{"globalThis.SimulatorInstance = new psvm.ShowdownSimulator();"};
-const std::string SETUP_SIM_JS{"import * as os from \"os\";\n"
- "import * as std from \"std\";\n"
- "\n"
- "const inBuf = new Uint8Array(2048);\n"
- "const encoder = new psvm.TextEncoding.TextEncoder();\n"
- "const decoder = new psvm.TextEncoding.TextDecoder(\"utf-8\");\n"
- "\n"
- "os.setReadHandler(host.readFd, () => {\n"
- "  const bytes = os.read(host.readFd, inBuf.buffer, 0, 2048);\n"
- "\n"
- "    if (bytes > 0){\n"
- "      let msg = decoder.decode(inBuf);\n"
- "\n"
- "      const lines = msg.split(\"\\0\");\n"
- "      const lines_trimmed = lines.map((line) => line.replaceAll(\"\\0\", \"\"));\n"
- "\n"
- "      (async () => {\n"
- "        for(const msg of lines_trimmed) {\n"
- "          if (msg.startsWith(\">\")) {\n"
- "            await SimulatorInstance.writeToOmniscient(msg);\n"
- "          }\n"
- "        }\n"
- "      })();\n"
- "    }\n"
- "});\n"
- "\n"
- "function waitForEmptyArray(arr) {\n"
- "  return new Promise((resolve) => {\n"
- "    const checkEmpty = () => {\n"
- "      if (arr.length === 0) {\n"
- "        resolve(); // Resolve the Promise when the array is empty\n"
- "      } else {\n"
- "        setTimeout(checkEmpty, 100); // Check again after a delay\n"
- "      }\n"
- "    };\n"
- "\n"
- "    checkEmpty(); // Start checking immediately\n"
- "  });\n"
- "}\n"
- "\n"
- "os.setWriteHandler(host.writeFd, () => {\n"
- "  if (SimulatorInstance.output.length > 0) {\n"
- "    let line = SimulatorInstance.output.shift();\n"
- "    let msg = encoder.encode(line + '\\0');\n"
- "\n"
- "    let bytes = os.write(host.writeFd, msg.buffer, 0, msg.length);\n"
- "\n"
- "    if (line.startsWith(\"|win\") || line.startsWith(\"|tie\")) {\n"
- "      // wait for the output buffer to empty\n"
- "      waitForEmptyArray(SimulatorInstance.output).then(() => {\n"
- "        os.setReadHandler(host.readFd, null);\n"
- "        os.setWriteHandler(host.writeFd, null);\n"
- "        std.exit(0);\n"
- "      });\n"
- "    }\n"
- "  }\n"
- "});"};
+    }
+}
 
-
-
-class ShowdownRuntime {
+/// @brief A wrapper for smogon/pokemon-showdown's simulator
+class ShowdownService {
 public:
-    ShowdownRuntime();
+    /// @brief Create a new simulator JS context
+    ShowdownService();
 
-    ~ShowdownRuntime();
+    /// @brief Free the simulator JS context
+    ~ShowdownService();
 
-    void insert(std::string &input);
+    /// @brief Start a new battle stream
+    /// @return UUID used to identify the new battle
+    std::string create_battle();
 
-    std::optional<std::string> readResult();
+    /// @brief Writes a line to a battle stream
+    /// @param id UUID of the battle to write to
+    /// @param message Line to write to the battle stream. '\n' will be appended to the end of the string if it is missing.
+    void write_to_battle(const std::string &id, const std::string &message);
 
-    std::optional<std::function<void()>> onSimulatorResponse;
-
-    void wait_for_child();
-
-    bool isParent;
-
-    std::vector<std::string> output;
+    /// @brief Callback function to call when a battle stream produces output
+    std::optional<std::function<void(std::string, std::string)>> sim_resp_callback;
 
 private:
-    JSRuntime *rt;
-    JSContext *ctx;
+    /// @brief Used to generate battle UUIDs
+    boost::uuids::random_generator uuid_generator_;
 
-    JSContext *JS_NewCustomContext(JSRuntime *rt);
+    /// @brief Generate a UUID
+    /// @return the generated UUID, as a std::string
+    std::string get_uuid();
 
-    int parent_to_child[2];
-    int child_to_parent[2];
-    pid_t child_pid;
+    /// @brief QuickJS Runtime
+    qjs::JSRuntime *rt;
+
+    /// @brief QuickJS COntext
+    qjs::JSContext *ctx;
+
+    /// @brief Calls the (non-static) callback function on simulator output
+    /// @param _ctx QuickJS context
+    /// @param this_val unused
+    /// @param argc argument count (2)
+    /// @param argv argument vector [std::string id, std::string msg]
+    /// @return unused
+    static qjs::JSValue
+    callback_wrapper_(qjs::JSContext *_ctx, qjs::JSValueConst this_val, int argc, qjs::JSValueConst *argv);
 };
 
 #endif

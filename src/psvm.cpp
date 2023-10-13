@@ -1,135 +1,98 @@
 #include "psvm.hpp"
 
-ShowdownRuntime::ShowdownRuntime() {
-    // Create pipes
-    if (pipe(this->parent_to_child) == -1 || pipe(this->child_to_parent) == -1) {
-        perror("pipe");
-        exit(EXIT_FAILURE); // todo exceptions instead of exit
-    }
+// HACK: C can only call static functions (which have no access to "this"),
+//       so store the instance as a file-scoped variable. Note that this means
+//       there can only be one ShowdownService active at a time. Fix this later
+static ShowdownService *g_ShowdownService;
 
-    // Fork process
-    this->child_pid = fork();
-    if (this->child_pid == -1) {
-        perror("fork");
-        exit(EXIT_FAILURE); // todo exceptions instead of exit
-    }
+ShowdownService::ShowdownService() {
+    // Create JS runtime and context
+    this->rt = qjs::JS_NewRuntime();
+    js_std_init_handlers(this->rt);
+    JS_SetModuleLoaderFunc(this->rt, nullptr, qjs::js_module_loader, nullptr);
+    this->ctx = qjs::JS_NewContext(this->rt);
 
-    if (this->child_pid == 0) {
-        // inside child
-        this->isParent = false;
+    // Add the response callback wrapper to the global scope in the JS context
+    auto global = qjs::JS_GetGlobalObject(this->ctx);
+    qjs::JS_SetPropertyStr(this->ctx, global, "ResponseCallback",
+                           qjs::JS_NewCFunction(this->ctx, ShowdownService::callback_wrapper_, "ResponseCallback", 3));
+    qjs::JS_FreeValue(this->ctx, global);
 
-        // close unused pipe ends
-        close(this->parent_to_child[1]);
-        close(this->child_to_parent[0]);
+    // Add ShowdownService class to global namespace
+    qjs::js_std_eval_binary(this->ctx, psvmjs::qjsc_psvm, psvmjs::qjsc_psvm_size, 0);
+    qjs::js_std_eval_binary(this->ctx, psvmjs::qjsc_globalize, psvmjs::qjsc_globalize_size, 0);
 
-        // Init the JS runtime
-        this->rt = JS_NewRuntime();
-        js_std_init_handlers(this->rt);
-        JS_SetModuleLoaderFunc(this->rt, NULL, js_module_loader, NULL);
-        this->ctx = JS_NewCustomContext(this->rt);
+    // Initialize ShowdownService instance
+    auto create_sim_eval = "globalThis.ShowdownServiceInstance = new psvm.ShowdownService();";
+    qjs::JS_Eval(this->ctx, create_sim_eval, strlen(create_sim_eval), "<input>", JS_EVAL_TYPE_MODULE);
 
-        // Create the simulator
-        JS_Eval(this->ctx, CREATE_SIM_JS.c_str(), CREATE_SIM_JS.size(), "<module>", JS_EVAL_TYPE_MODULE);
+    // Execute JS event loop
+    qjs::js_std_loop(this->ctx);
 
-        // Set up the simulator
-        JS_Eval(this->ctx, SETUP_SIM_JS.c_str(), SETUP_SIM_JS.size(), "<module>", JS_EVAL_TYPE_MODULE);
-
-        // JS runtime event loop
-        js_std_loop(this->ctx);
-
-        JS_FreeContext(this->ctx);
-        JS_FreeRuntime(this->rt);
-    } else {
-        // inside parent
-        this->isParent = true;
-
-        // close unused pipe ends
-        close(this->parent_to_child[0]);
-        close(this->child_to_parent[1]);
-    }
+    // TODO: throw an exception if there's already an existing ShowdownService instance
+    // Add this instance to the file scope
+    g_ShowdownService = this;
 }
 
-ShowdownRuntime::~ShowdownRuntime() {
+ShowdownService::~ShowdownService() {
+    // make sure all the JS events have been executed
+    qjs::js_std_loop(this->ctx);
+
+    // Free the JS context and runtime
+    qjs::JS_FreeContext(this->ctx);
+    qjs::JS_FreeRuntime(this->rt);
+}
+
+std::string ShowdownService::get_uuid() {
+    return boost::uuids::to_string(this->uuid_generator_());
+}
+
+std::string ShowdownService::create_battle() {
+    auto battle_id = this->get_uuid();
+
+    // Construct the JS code used to create a new battle
+    std::stringstream js_sstream;
+    js_sstream << "ShowdownServiceInstance.startBattle('" << battle_id << "');";
+
+    // Create a new battle using the generated uuid
+    qjs::JS_Eval(this->ctx, js_sstream.str().c_str(), js_sstream.str().length(), "<input>", JS_EVAL_TYPE_MODULE);
+    qjs::js_std_loop(this->ctx);
+
+    return battle_id;
+}
+
+void ShowdownService::write_to_battle(const std::string &id, const std::string &message) {
+    // Construct the JS code used to write to a battle stream
+    std::stringstream js_sstream;
+    js_sstream << "ShowdownServiceInstance.writeToBattle('" << id << "', '" << message << "');";
+
+    // Write to a battle stream using its uuid
+    qjs::JS_Eval(this->ctx, js_sstream.str().c_str(), js_sstream.str().length(), "<input>", JS_EVAL_TYPE_MODULE);
+    qjs::js_std_loop(this->ctx);
+}
+
+qjs::JSValue ShowdownService::callback_wrapper_(qjs::JSContext *_ctx, qjs::JSValueConst this_val, int argc,
+                                                qjs::JSValueConst *argv) {
+    using namespace qjs; // JS_EXCEPTION and JS_UNDEFINED below are macros, so we need this
+
+    if (argc != 2) {
+        JS_ThrowTypeError(_ctx, "Expected 2 arguments");
+        return JS_EXCEPTION;
+    }
+
+    // Convert the JS strings to c-strings
+    const char *id_cstr = JS_ToCString(_ctx, argv[0]);
+    const char *msg_cstr = JS_ToCString(_ctx, argv[1]);
+
+    // Call this instance's response callback if it exists using the pointer to this instance stored in
+    // the file scope
+    if (g_ShowdownService->sim_resp_callback) {
+        g_ShowdownService->sim_resp_callback.value()(std::string(id_cstr), std::string(msg_cstr));
+    }
+
     // Clean up
-    if (this->isParent) {
-        close(this->parent_to_child[1]);
-        close(this->child_to_parent[0]);
-    } else {
-        close(this->parent_to_child[0]);
-        close(this->child_to_parent[1]);
-    }
-}
+    JS_FreeCString(_ctx, id_cstr);
+    JS_FreeCString(_ctx, msg_cstr);
 
-void ShowdownRuntime::insert(std::string &input) {
-    if (!this->isParent) {
-        return;
-    }
-
-    ssize_t bytesWritten = write(this->parent_to_child[1], input.c_str(), strlen(input.c_str()) + 1);
-
-    if (bytesWritten == -1) {
-        perror("write");
-        exit(1); // todo exceptions instead of exit
-    }
-}
-
-std::optional<std::string> ShowdownRuntime::readResult() {
-    if (!this->isParent) {
-        return {};
-    }
-
-    char buffer[1024];
-    ssize_t bytes_read = read(this->child_to_parent[0], buffer, sizeof(buffer));
-
-    switch (bytes_read) {
-        case -1:
-            perror("read");
-            exit(1); // todo exception
-            break;
-        case 0:
-            return {};
-        default:
-            return std::string(buffer, bytes_read - 1);
-    }
-
-    return {};
-}
-
-JSContext *ShowdownRuntime::JS_NewCustomContext(JSRuntime *rt) {
-    JSContext *ctx = JS_NewContextRaw(rt);
-    if (!ctx)
-        return nullptr;
-    JS_AddIntrinsicBaseObjects(ctx);
-    JS_AddIntrinsicDate(ctx);
-    JS_AddIntrinsicEval(ctx);
-    JS_AddIntrinsicStringNormalize(ctx);
-    JS_AddIntrinsicRegExp(ctx);
-    JS_AddIntrinsicJSON(ctx);
-    JS_AddIntrinsicProxy(ctx);
-    JS_AddIntrinsicMapSet(ctx);
-    JS_AddIntrinsicTypedArrays(ctx);
-    JS_AddIntrinsicPromise(ctx);
-    JS_AddIntrinsicBigInt(ctx);
-    js_init_module_os(ctx, "os");
-    js_init_module_std(ctx, "std");
-
-    // Add compiled JS bundle to global namespace
-    js_std_eval_binary(ctx, qjsc_psvm, qjsc_psvm_size, 0);
-    js_std_eval_binary(ctx, qjsc_globalize, qjsc_globalize_size, 0);
-
-    // Expose pipes to JS context
-    JSValue global_obj = JS_GetGlobalObject(ctx);
-    JSValue host = JS_NewObject(ctx);
-    JS_SetPropertyStr(ctx, global_obj, "host", host);
-    JS_SetPropertyStr(ctx, host, "readFd", JS_NewInt32(ctx, parent_to_child[0]));
-    JS_SetPropertyStr(ctx, host, "writeFd", JS_NewInt32(ctx, child_to_parent[1]));
-
-    JS_FreeValue(ctx, global_obj);
-    return ctx;
-}
-
-void ShowdownRuntime::wait_for_child() {
-    if (this->isParent) {
-        wait(NULL);
-    }
+    return JS_UNDEFINED;
 }

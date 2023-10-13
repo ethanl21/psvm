@@ -1,15 +1,25 @@
-# Todo
-- [ ] convert to CMake project
-- [ ] add exceptions to handle errors
-- [ ] produce shared library, static object, standalone cli executable
-- [ ] use thread instead of fork to prevent methods from being called in the simulator process
-- [ ] pass messages using message queues instead of pipes
-- [ ] possibly use Boost
-- [ ] possibly use ftk/quickjspp wrapper
-- [ ] possibly use an msvc compatible QuickJS fork
-- [ ] add demo CLI executable (Boost program options?)
+# TODO
 
-## NOTES
-Writing to the sim stream in JS returns a promise that resolves when it's safe to write to the stream again. find out if this is a good time to check for output and insert it into the message queue.
+## Build
 
-explore replicating smogon's pokemon-showdown cli file (pokemon-showdown in their git repo). it's a nodejs script, so replace the node parts with vanilla js or c++ wrapper fns. provide a size comparison between that replicated cli program and smogon's cli script bundled with vercel/pkg, deno compile, and bun compile.
+- [ ] Convert to CMake project
+- [ ] Create a CMake build script for QuickJS. This project only needs to build `libquickjs.a` and `qjsc`.
+- [ ] Create a CMake script to compile the js bundle with `qjsc` and transform it into C++ source code.
+- [ ] Possibly use a MVSC compatible QuickJS fork
+
+## Documentation
+
+- [ ] Document code, Doxygen -> Sphinx + Breathe -> GitHub Pages
+- [ ] Provide a size on disk and execution speed comparison between `psvm`'s CLI program and `smogon/pokemon-showdown`'s
+  CLI program when packaged with `vercel/pkg`, `deno compile`, and `bun compile`
+
+## Features
+
+- [ ] Produce a CLI executable mirroring that of `smogon/pokemon-showdown`'s Node script
+- [ ] Allow creation of multiple battles with UUID
+- [ ] Explore tracking battle state in more detail with `@pkmn/battle`
+
+## Refactor
+
+- [ ] Add exceptions to handle errors, remove any exit calls
+- [ ] Allow user to specify C++ callback function for any simulator output

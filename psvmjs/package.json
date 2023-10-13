@@ -17,7 +17,6 @@
   "dependencies": {
     "@pkmn/randoms": "^0.7.52",
     "@pkmn/sim": "^0.7.52",
-    "@pkmn/streams": "^1.1.0",
-    "@zxing/text-encoding": "^0.9.0"
+    "@pkmn/streams": "^1.1.0"
   }
 }
