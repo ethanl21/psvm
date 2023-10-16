@@ -1,4 +1,4 @@
-[submodule "lib/quickjs"]
-	path = psvm/lib/quickjs
-	url = https://github.com/bellard/quickjs
+[submodule "psvm/lib/quickjspp"]
+	path = psvm/lib/quickjspp
+	url = https://gitlab.com/c-smile/quickjspp
 	ignore = all
