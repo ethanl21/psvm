@@ -5,17 +5,18 @@
 #ifndef PSVM_HPP
 #define PSVM_HPP
 
-#include <string>       // std::string
-#include <sstream>      // std::stringstream
-#include <optional>     // std::optional
-#include <functional>   // std::function
-#include <memory>       // std::unique_ptr
-#include <random>       // std::random_device, std::mt19937, std::uniform_int_distribution
+#include <functional> // std::function
+#include <memory>     // std::unique_ptr
+#include <optional>   // std::optional
+#include <random>     // std::random_device, std::mt19937, std::uniform_int_distribution
+#include <sstream>    // std::stringstream
+#include <string>     // std::string
 
 /**
  * @brief Manages Pokémon Showdown battle streams running in an embedded JavaScript context.
  */
-class ShowdownService {
+class ShowdownService
+{
 public:
     /**
      * @brief Creates a new simulator JS context
@@ -36,16 +37,19 @@ public:
     /**
      * @brief Writes a line to a battle stream
      * @param id UUID of the battle to write to
-     * @param message Line to write to the battle stream. '\\n' will be appended to the end of the string if it is missing.
+     * @param message Line to write to the battle stream. '\\n' will be appended to the end of the
+     * string if it is missing.
      */
-    void WriteMessage(const std::string &id, const std::string &message);
+    void WriteMessage( const std::string &id, const std::string &message );
 
     /**
      * @brief Sets the simulator message response callback
-     * @param simulatorOnRespCallback a function that will be called whenever the simulator produces output
+     * @param simulatorOnRespCallback a function that will be called whenever the simulator produces
+     * output
      */
     void setSimulatorOnResponseCallback(
-            const std::optional<std::function<void(std::string, std::string)>> &simulatorOnRespCallback);
+        const std::optional<std::function<void( std::string, std::string )>>
+            &simulatorOnRespCallback );
 
     /**
      * @brief Clears the simulator message response callback
@@ -62,9 +66,9 @@ private:
     /// @endcond
 
     /**
-    * @brief Callback function to call when a battle stream produces output
-    */
-    std::optional<std::function<void(std::string, std::string)>> on_msg_received_callback_;
+     * @brief Callback function to call when a battle stream produces output
+     */
+    std::optional<std::function<void( std::string, std::string )>> on_msg_received_callback_;
 };
 
 #endif

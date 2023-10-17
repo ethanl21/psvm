@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "psvm.hpp"
+#include <psvm/psvm.hpp>
 
 
 const std::vector<std::string> SIM_TEST_LINES = {

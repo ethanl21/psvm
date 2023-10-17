@@ -4,24 +4,24 @@ project(quickjs LANGUAGES C)
 # hack to fix collision between the VERSION file and the c++ std <version> header
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION")
     file(RENAME "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION" "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION.txt")
-endif()
+endif ()
 
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION.txt" version)
 file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/quickjs-version.h" "#define QUICKJS_VERSION \"${version}\"\n")
 
-if(MSVC)
+if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
+endif ()
 
 set(quickjs_src quickjs.c libbf.c libunicode.c libregexp.c cutils.c quickjs-libc.c)
 
 set(prefix "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/")
 set(prefixed_srcs)
 
-foreach(item ${quickjs_src})
+foreach (item ${quickjs_src})
     string(CONCAT modified_item "${prefix}" "${item}")
     list(APPEND prefixed_srcs ${modified_item})
-endforeach()
+endforeach ()
 
 add_library(quickjs ${prefixed_srcs})
 target_compile_definitions(quickjs PRIVATE CONFIG_BIGNUM _GNU_SOURCE)
@@ -34,8 +34,8 @@ target_compile_definitions(quickjs-dumpleaks PUBLIC JS_STRICT_NAN_BOXING)
 add_executable(qjsc "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/qjsc.c")
 target_link_libraries(qjsc PRIVATE quickjs)
 
-if(UNIX)
+if (UNIX)
     find_package(Threads)
     target_link_libraries(quickjs ${CMAKE_DL_LIBS} m Threads::Threads)
     target_link_libraries(quickjs-dumpleaks ${CMAKE_DL_LIBS} m Threads::Threads)
-endif()
+endif ()
