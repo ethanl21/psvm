@@ -1,4 +1,5 @@
 [submodule "extern/quickjspp"]
 	path = extern/quickjspp
-	url = https://gitlab.com/c-smile/quickjspp
-	ignore = all
+	url = https://gitlab.com/c-smile/quickjspp.git
+	branch = master
+	ignore = dirty
