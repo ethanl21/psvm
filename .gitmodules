@@ -1,4 +1,4 @@
 [submodule "psvm/lib/quickjspp"]
-	path = psvm/lib/quickjspp
+	path = extern/quickjspp
 	url = https://gitlab.com/c-smile/quickjspp
 	ignore = all
