@@ -5,7 +5,7 @@
   "main": "src/main.ts",
   "type": "module",
   "scripts": {
-    "build": "./scripts/build.js"
+    "build": "node ./scripts/build.js"
   },
   "keywords": [],
   "author": "",

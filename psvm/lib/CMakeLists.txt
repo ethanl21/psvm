@@ -9,6 +9,10 @@ endif()
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION.txt" version)
 file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/quickjs-version.h" "#define QUICKJS_VERSION \"${version}\"\n")
 
+if(MSVC)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 set(quickjs_src quickjs.c libbf.c libunicode.c libregexp.c cutils.c quickjs-libc.c)
 
 set(prefix "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/")
