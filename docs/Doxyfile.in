@@ -2820,3 +2820,5 @@ MSCGEN_TOOL            =
 # command).
 
 MSCFILE_DIRS           =
+
+IGNORE_SEGMENT_COND = NO
