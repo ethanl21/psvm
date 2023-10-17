@@ -6,10 +6,6 @@
 
 #include "psvm.hpp"
 
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
-
 // qjsc compiled bytecode
 namespace psvmjs {
     extern "C" {
@@ -27,6 +23,41 @@ namespace qjs {
 
     }
 };
+
+// This is less random than a true UUID, but for this project it should be good enough
+namespace uuid {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<> dis(0, 15);
+    static std::uniform_int_distribution<> dis2(8, 11);
+
+    std::string generate_uuid_v4() {
+        std::stringstream ss;
+        int i;
+        ss << std::hex;
+        for (i = 0; i < 8; i++) {
+            ss << dis(gen);
+        }
+        ss << "-";
+        for (i = 0; i < 4; i++) {
+            ss << dis(gen);
+        }
+        ss << "-4";
+        for (i = 0; i < 3; i++) {
+            ss << dis(gen);
+        }
+        ss << "-";
+        ss << dis2(gen);
+        for (i = 0; i < 3; i++) {
+            ss << dis(gen);
+        }
+        ss << "-";
+        for (i = 0; i < 12; i++) {
+            ss << dis(gen);
+        };
+        return ss.str();
+    }
+}
 
 // HACK: C can only call static functions (which have no access to "this"),
 //       so store the instance as a file-scoped variable. Note that this means
@@ -117,7 +148,7 @@ ShowdownService::~ShowdownService() {
 }
 
 std::string ShowdownService::CreateBattle() {
-    auto battle_id = boost::uuids::to_string(boost::uuids::random_generator()());
+    auto battle_id = uuid::generate_uuid_v4();
 
     // Construct the JS code used to create a new battle
     std::stringstream js_sstream;

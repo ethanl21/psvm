@@ -10,6 +10,7 @@
 #include <optional>     // std::optional
 #include <functional>   // std::function
 #include <memory>       // std::unique_ptr
+#include <random>       // std::random_device, std::mt19937, std::uniform_int_distribution
 
 /**
  * @brief Manages Pokémon Showdown battle streams running in an embedded JavaScript context.

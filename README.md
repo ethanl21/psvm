@@ -34,7 +34,7 @@ pnpm build
 
 # build psvm (requires vcpkg)
 # (in the root directory)
-cmake -B [build directory] -S . -DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
+cmake -B [build directory] -S .
 cmake --build [build directory]
 ```
 

@@ -1,9 +1,0 @@
-{
-  "name" : "psvm",
-  "version-string" : "1.0.0",
-  "builtin-baseline" : "ced4b6dbc1fcae4a30b39d004ba67242a79434a5",
-  "dependencies" : [ {
-    "name" : "boost-uuid",
-    "version>=" : "1.83.0"
-  } ]
-}
