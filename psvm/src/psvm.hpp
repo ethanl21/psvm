@@ -35,7 +35,7 @@ public:
     /**
      * @brief Writes a line to a battle stream
      * @param id UUID of the battle to write to
-     * @param message Line to write to the battle stream. '\n' will be appended to the end of the string if it is missing.
+     * @param message Line to write to the battle stream. '\\n' will be appended to the end of the string if it is missing.
      */
     void WriteMessage(const std::string &id, const std::string &message);
 
