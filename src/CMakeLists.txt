@@ -22,7 +22,11 @@ target_sources(psvm
 )
 
 target_include_directories(psvm
-        PRIVATE
+        PUBLIC SYSTEM
         "${CMAKE_SOURCE_DIR}/include"
+)
+
+target_include_directories(psvm
+        PRIVATE
         "${CMAKE_SOURCE_DIR}/extern/quickjspp"
 )
