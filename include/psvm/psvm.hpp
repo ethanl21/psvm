@@ -57,13 +57,13 @@ public:
     void clearSimulatorOnResponseCallback();
 
 private:
-    /// @cond IGNORE_SEGMENT_COND
+    /// \cond HIDDEN_SYMBOLS
     // pImpl used so the end user doesn't have to link QuickJS or Boost::uuid
     class impl;
 
     std::unique_ptr<impl> pimpl;
 
-    /// @endcond
+    /// \endcond
 
     /**
      * @brief Callback function to call when a battle stream produces output
