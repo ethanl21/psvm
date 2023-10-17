@@ -10,6 +10,7 @@
 ## Documentation
 
 - [x] Document code, Doxygen -> Sphinx + Breathe -> GitHub Pages
+- [ ] Find a way to make Doxygen/Sphinx optional dependencies since users don't need to build the docs
 - [ ] Provide a size on disk and execution speed comparison between `psvm`'s CLI program and `smogon/pokemon-showdown`'s
   CLI program when packaged with `vercel/pkg`, `deno compile`, and `bun compile`
 
