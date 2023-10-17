@@ -1,4 +1,5 @@
-include/psvmjs.c
 .vscode
 .idea
 cmake-build-debug
+cmake-build-release
+psvm/src/psvmjs.c

@@ -9,13 +9,7 @@
 #include <sstream>      // std::stringstream
 #include <optional>     // std::optional
 #include <functional>   // std::function
-
-// forward declarations to make this header easier to link to
-namespace qjs{
-    class JSRuntime;
-    class JSContext;
-    class JSValue;
-};
+#include <memory>       // std::unique_ptr
 
 /**
  * @brief Manages Pokémon Showdown battle streams running in an embedded JavaScript context.
@@ -49,7 +43,8 @@ public:
      * @brief Sets the simulator message response callback
      * @param simulatorOnRespCallback a function that will be called whenever the simulator produces output
      */
-    void setSimulatorOnResponseCallback(const std::optional<std::function<void(std::string, std::string)>> &simulatorOnRespCallback);
+    void setSimulatorOnResponseCallback(
+            const std::optional<std::function<void(std::string, std::string)>> &simulatorOnRespCallback);
 
     /**
      * @brief Clears the simulator message response callback
@@ -57,26 +52,10 @@ public:
     void clearSimulatorOnResponseCallback();
 
 private:
-    /**
-     * @brief QuickJS Runtime
-     */
-    qjs::JSRuntime *rt_;
+    // pImpl used so the end user doesn't have to link QuickJS or Boost::uuid
+    class impl;
 
-    /**
-     * @brief QuickJS Context
-     */
-    qjs::JSContext *ctx_;
-
-    /**
-     * @brief Calls the (non-static) callback function on simulator output
-     * @param _ctx QuickJS context
-     * @param this_val unused
-     * @param argc argument count (2)
-     * @param argv argument vector [std::string id, std::string msg]
-     * @return unused
-     */
-    static qjs::JSValue
-    callback_wrapper_(qjs::JSContext *_ctx, qjs::JSValue this_val, int argc, qjs::JSValue *argv);
+    std::unique_ptr<impl> pimpl;
 
     /**
     * @brief Callback function to call when a battle stream produces output
