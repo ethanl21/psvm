@@ -37,6 +37,16 @@ include(NodeJS)
 # Add src directory
 add_subdirectory(src)
 
+target_include_directories(psvm
+        PUBLIC SYSTEM
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+target_include_directories(psvm
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp"
+)
+
 # Turn on ccache if found
 include(ccache)
 
@@ -58,6 +68,6 @@ target_link_libraries(psvm_test
 )
 
 ## hack to fix collision between the VERSION file and the c++ std <version> header
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/_VERSION")
-    file(RENAME "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/_VERSION" "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/VERSION")
-endif ()
+#if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/_VERSION")
+#    file(RENAME "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/_VERSION" "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/VERSION")
+#endif ()

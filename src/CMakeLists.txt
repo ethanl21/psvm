@@ -14,19 +14,9 @@ add_dependencies(generate_psvmjs_c qjsc)
 # psvmjs' bytecode is required by psvm
 add_dependencies(psvm generate_psvmjs_c)
 
+
 target_sources(psvm
         PRIVATE
         psvm.cpp
         psvmjs.c
-        "${CMAKE_SOURCE_DIR}/include/psvm/psvm.hpp"
-)
-
-target_include_directories(psvm
-        PUBLIC SYSTEM
-        "${CMAKE_SOURCE_DIR}/include"
-)
-
-target_include_directories(psvm
-        PRIVATE
-        "${CMAKE_SOURCE_DIR}/extern/quickjspp"
 )
