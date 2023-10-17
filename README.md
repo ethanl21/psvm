@@ -4,9 +4,8 @@
 PSVM is Pokémon Showdown's simulator compiled to native code with no runtime dependencies.
 
 > **Warning**  
-> PSVM is still under construction and is not currently usable for its intended purpose.
->
-> PSVM currently cannot be compiled on Windows.
+> PSVM is still under construction. Implementation details are likely to change.
+
 
 ### Details
 
@@ -19,7 +18,7 @@ supports native C++ modules. An example Godot 4 integration is planned.
 
 ## Building
 
-To build PSVM, Node.js, CMake, and vcpkg are required. (better CMake workflow wip)
+To build PSVM, Node.js, CMake, and vcpkg are required.
 
 To build the test driver program:
 
@@ -27,19 +26,11 @@ To build the test driver program:
 git clone --recursive https://github.com/ethanl21/psvm
 cd psvm
 
-# build quickjs
-cd ./src/lib/quickjs
-make libquickjs.lto.a libquickjs.a qjsc
-
 # build the JavaScript bundle
 # (in the root directory)
 cd psvmjs
 pnpm i
 pnpm build
-
-# compile the JavaScript bundle to bytecode
-# (in the root directory)
-./psvm/lib/quickjs/qjsc -c -o ./psvm/src/psvmjs.c ./psvmjs/dist/globalize.js 
 
 # build psvm (requires vcpkg)
 # (in the root directory)
