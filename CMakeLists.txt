@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.26)
 
+## hack to fix collision between the VERSION file and the c++ std <version> header
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/VERSION")
+    file(RENAME "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/VERSION" "${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/VERSION.txt")
+endif ()
+
+
 # Add paths to modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
@@ -50,4 +56,11 @@ add_subdirectory(test)
 target_link_libraries(psvm_test
         PRIVATE
         psvm
+)
+
+# VERSION.txt -> VERSION
+add_custom_command(
+        TARGET psvm
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/VERSION.txt ${CMAKE_CURRENT_SOURCE_DIR}/extern/quickjspp/VERSION
 )

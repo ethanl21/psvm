@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 project(quickjs LANGUAGES C)
 
-# hack to fix collision between the VERSION file and the c++ std <version> header
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION")
-    file(RENAME "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION" "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION.txt")
-endif ()
-
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/VERSION.txt" version)
-file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/quickjs-version.h" "#define QUICKJS_VERSION \"${version}\"\n")
-
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif ()
