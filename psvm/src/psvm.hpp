@@ -52,6 +52,7 @@ public:
     void clearSimulatorOnResponseCallback();
 
 private:
+    // pImpl used so the end user doesn't have to link QuickJS or Boost::uuid
     class impl;
 
     std::unique_ptr<impl> pimpl;
