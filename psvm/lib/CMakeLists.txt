@@ -30,6 +30,9 @@ target_compile_definitions(quickjs-dumpleaks PUBLIC JS_STRICT_NAN_BOXING)
 add_executable(qjsc "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/qjsc.c")
 target_link_libraries(qjsc PRIVATE quickjs)
 
+add_custom_target(generate_psvmjs
+COMMAND qjsc "-c" "-o" "${CMAKE_SOURCE_DIR}/psvm/src/psvmjs.c" "${CMAKE_SOURCE_DIR}/psvmjs/dist/globalize.js")
+
 if(UNIX)
     find_package(Threads)
     target_link_libraries(quickjs ${CMAKE_DL_LIBS} m Threads::Threads)
