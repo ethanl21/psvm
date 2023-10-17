@@ -26,6 +26,9 @@ if (APPLE)
     set(LIB_ARCH "universal")
 endif ()
 
+# Find Node.js and npm to bundle psvmjs
+include(NodeJS)
+
 # Add src directory
 add_subdirectory(src)
 

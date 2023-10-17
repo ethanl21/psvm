@@ -18,27 +18,22 @@ supports native C++ modules. An example Godot 4 integration is planned.
 
 ## Building
 
-To build PSVM, Node.js, CMake, and vcpkg are required.
+To build PSVM, Node.js and CMake are required.
 
 To build the test driver program:
 
 ```bash
+# Clone the repository with submodules
 git clone --recursive https://github.com/ethanl21/psvm
 cd psvm
 
-# build the JavaScript bundle
-# (in the root directory)
-cd psvmjs
-pnpm i
-pnpm build
-
-# build psvm (requires vcpkg)
+# build psvm
 # (in the root directory)
 cmake -B [build directory] -S .
 cmake --build [build directory]
 ```
 
-A compiled test driver executable will be located at ``[build directory]/psvm/test/psvm_test``.
+A compiled test driver executable will be located at ``[build directory]/test/psvm_test``.
 
 ## Attribution
 
