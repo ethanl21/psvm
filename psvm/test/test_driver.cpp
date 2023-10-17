@@ -15,7 +15,7 @@ int main() {
     ShowdownService ss;
 
     // Demo callback function, prints to stdout
-    std::function<void(std::string, std::string)> callback = [](const std::string &id, const std::string &msg) {
+    std::function < void(std::string, std::string) > callback = [](const std::string &id, const std::string &msg) {
         std::cout << "[" << id << "]\n" << msg << "\n";
     };
     ss.setSimulatorOnResponseCallback(callback);
