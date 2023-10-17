@@ -48,8 +48,7 @@ public:
      * output
      */
     void setSimulatorOnResponseCallback(
-        const std::optional<std::function<void( std::string, std::string )>>
-            &simulatorOnRespCallback );
+        const std::function<void( std::string, std::string )> &simulatorOnRespCallback );
 
     /**
      * @brief Clears the simulator message response callback

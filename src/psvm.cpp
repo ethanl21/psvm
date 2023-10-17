@@ -159,12 +159,7 @@ ShowdownService::ShowdownService() : pimpl( new impl )
 
 ShowdownService::~ShowdownService()
 {
-    //    // make sure all the JS events have been executed
-    //    qjs::js_std_loop(this->pimpl->ctx_);
-    //
-    //    // Free the JS context and runtime
-    //    qjs::JS_FreeContext(this->pimpl->ctx_);
-    //    qjs::JS_FreeRuntime(this->pimpl->rt_);
+    g_ShowdownService = nullptr;
 }
 
 std::string ShowdownService::CreateBattle()
@@ -199,7 +194,7 @@ void ShowdownService::WriteMessage( const std::string &id, const std::string &me
 }
 
 void ShowdownService::setSimulatorOnResponseCallback(
-    const std::optional<std::function<void( std::string, std::string )>> &simRespCallback )
+    const std::function<void( std::string, std::string )> &simRespCallback )
 {
     on_msg_received_callback_ = simRespCallback;
 }
