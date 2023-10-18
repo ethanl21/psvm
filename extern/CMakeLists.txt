@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.26)
-project(quickjs LANGUAGES C)
+project(quickjs LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_compile_options(/std:c++latest)
 endif ()
 
 set(quickjs_src quickjs.c libbf.c libunicode.c libregexp.c cutils.c quickjs-libc.c)
