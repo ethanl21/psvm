@@ -63,6 +63,8 @@ private:
 
     std::unique_ptr<impl> pimpl;
 
+    static std::string generate_uuidv4();
+
     /// \endcond
 
     /**

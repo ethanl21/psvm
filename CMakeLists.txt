@@ -57,7 +57,8 @@ add_subdirectory(extern)
 
 target_link_libraries(psvm
         PRIVATE
-        quickjs)
+        quickjs
+)
 
 # Add test directory
 add_subdirectory(test)
