@@ -29,6 +29,18 @@ target_compile_definitions(quickjs-dumpleaks PUBLIC JS_STRICT_NAN_BOXING)
 add_executable(qjsc "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/qjsc.c")
 target_link_libraries(qjsc PRIVATE quickjs)
 
+if (UNIX AND NOT APPLE)
+    set_target_properties(quickjs
+            PROPERTIES
+            POSITION_INDEPENDENT_CODE ON
+    )
+
+    set_target_properties(quickjs-dumpleaks
+            PROPERTIES
+            POSITION_INDEPENDENT_CODE ON
+    )
+endif ()
+
 if (UNIX)
     find_package(Threads)
     target_link_libraries(quickjs ${CMAKE_DL_LIBS} m Threads::Threads)

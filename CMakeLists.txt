@@ -20,6 +20,13 @@ endif ()
 # PSVM's static library
 add_library(psvm STATIC)
 
+if(UNIX AND NOT APPLE)
+    set_target_properties(psvm
+            PROPERTIES
+            POSITION_INDEPENDENT_CODE ON
+    )
+endif()
+
 # Use C++ 17
 target_compile_features(psvm
         PRIVATE
