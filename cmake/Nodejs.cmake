@@ -6,9 +6,14 @@ if (WIN32)
     )
 
     find_program(NPM_EXECUTABLE
-            NAMES npm.exe
+            NAMES npm.cmd
             HINTS "C:/Program Files/nodejs" "C:/Program Files (x86)/nodejs"
     )
+
+    # npm is a cmd file and not actually an executable
+    if(${NPM_EXECUTABLE})
+        set(${NPM_EXECUTABLE} "cmd ${NPM_EXECUTABLE}")
+    endif ()
 else ()
     find_program(NODE_EXECUTABLE
             NAMES node

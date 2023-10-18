@@ -16,7 +16,7 @@ if (CLANG_FORMAT_PROGRAM)
     list(FILTER CLANG_FORMAT_SOURCES EXCLUDE REGEX ".*/extern/.*")
     list(FILTER CLANG_FORMAT_SOURCES EXCLUDE REGEX ".*/gen/.*")
 
-    add_custom_target(clang-format
+    add_custom_target(psvm-clang-format
             COMMAND "${CLANG_FORMAT_PROGRAM}" --style=file -i ${CLANG_FORMAT_SOURCES}
             COMMENT "Running clang-format..."
             COMMAND_EXPAND_LISTS
