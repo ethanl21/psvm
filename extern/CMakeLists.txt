@@ -19,12 +19,17 @@ foreach (item ${quickjs_src})
 endforeach ()
 
 add_library(quickjs ${prefixed_srcs})
-target_compile_definitions(quickjs PRIVATE CONFIG_BIGNUM _GNU_SOURCE)
+target_compile_definitions(quickjs PRIVATE CONFIG_BIGNUM)
 target_compile_definitions(quickjs PUBLIC JS_STRICT_NAN_BOXING)
 
 add_library(quickjs-dumpleaks ${prefixed_srcs})
-target_compile_definitions(quickjs-dumpleaks PRIVATE CONFIG_BIGNUM _GNU_SOURCE DUMP_LEAKS=1)
+target_compile_definitions(quickjs-dumpleaks PRIVATE CONFIG_BIGNUM DUMP_LEAKS=1)
 target_compile_definitions(quickjs-dumpleaks PUBLIC JS_STRICT_NAN_BOXING)
+
+if(UNIX)
+    target_compile_definitions(quickjs PRIVATE _GNU_SOURCE)
+    target_compile_definitions(quickjs-dumpleaks PRIVATE _GNU_SOURCE)
+endif ()
 
 add_executable(qjsc "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/qjsc.c")
 target_link_libraries(qjsc PRIVATE quickjs)
@@ -45,4 +50,6 @@ if (UNIX)
     find_package(Threads)
     target_link_libraries(quickjs ${CMAKE_DL_LIBS} m Threads::Threads)
     target_link_libraries(quickjs-dumpleaks ${CMAKE_DL_LIBS} m Threads::Threads)
+
+
 endif ()
