@@ -32,7 +32,7 @@ if (APPLE)
 endif ()
 
 # Find Node.js and npm to bundle psvmjs
-include(NodeJS)
+include(Nodejs)
 
 # Add src directory
 add_subdirectory(src)
