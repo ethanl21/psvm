@@ -43,6 +43,4 @@ under the MIT license.
 
 [bellard/quickjs](https://github.com/bellard/quickjs) is distributed under the MIT license.
 
-[boostorg/uuid](https://github.com/boostorg/uuid) is distributed under the BSL-1.0 license.
-
 PSVM itself is distributed under the [GPL-3.0-Only](https://choosealicense.com/licenses/gpl-3.0/) license.
