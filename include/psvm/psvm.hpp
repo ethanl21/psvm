@@ -5,13 +5,13 @@
 #ifndef PSVM_HPP
 #define PSVM_HPP
 
+#include <cstring>    // std::strlen
 #include <functional> // std::function
 #include <memory>     // std::unique_ptr
 #include <optional>   // std::optional
 #include <random>     // std::random_device, std::mt19937, std::uniform_int_distribution
 #include <sstream>    // std::stringstream
 #include <string>     // std::string
-#include <cstring>    // std::strlen
 
 /**
  * @brief Manages Pokémon Showdown battle streams running in an embedded JavaScript context.
@@ -36,6 +36,17 @@ public:
     std::string CreateBattle();
 
     /**
+     * @brief Kills a battle stream if it exists
+     * @param id UUID of the battle stream to kill
+     */
+    void DeleteBattle( const std::string &id );
+
+    /**
+     * @brief Kills all the active battle streams
+     */
+    void DeleteAllBattles();
+
+    /**
      * @brief Writes a line to a battle stream
      * @param id UUID of the battle to write to
      * @param message Line to write to the battle stream. '\\n' will be appended to the end of the
@@ -58,7 +69,7 @@ public:
 
 private:
     /// \cond HIDDEN_SYMBOLS
-    // pImpl used so the end user doesn't have to link QuickJS or Boost::uuid
+    // pImpl used so the end user doesn't have to link QuickJS
     class impl;
 
     std::unique_ptr<impl> pimpl;

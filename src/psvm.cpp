@@ -138,13 +138,40 @@ std::string ShowdownService::CreateBattle()
     return battle_id;
 }
 
+void ShowdownService::DeleteBattle( const std::string &id )
+{
+    // Construct the JS code used to kill a battle stream
+    std::stringstream js_sstream;
+    js_sstream << "ShowdownServiceInstance.killBattle('" << id << "');";
+
+    // Write delete a battle stream using its uuid if it exists
+    auto r = qjs::JS_Eval( this->pimpl->ctx_, js_sstream.str().c_str(), js_sstream.str().length(),
+                           "", JS_EVAL_TYPE_GLOBAL );
+    qjs::JS_FreeValue( this->pimpl->ctx_, r );
+
+    qjs::js_std_loop( this->pimpl->ctx_ );
+}
+
+void ShowdownService::DeleteAllBattles()
+{
+    // Construct the JS code used to kill a battle stream
+    auto delete_all_eval = "ShowdownServiceInstance.killAllBattles();";
+
+    // Kill all battle streams
+    auto r = qjs::JS_Eval( this->pimpl->ctx_, delete_all_eval, std::strlen( delete_all_eval ), "",
+                           JS_EVAL_TYPE_GLOBAL );
+    qjs::JS_FreeValue( this->pimpl->ctx_, r );
+
+    qjs::js_std_loop( this->pimpl->ctx_ );
+}
+
 void ShowdownService::WriteMessage( const std::string &id, const std::string &message )
 {
     // Construct the JS code used to write to a battle stream
     std::stringstream js_sstream;
     js_sstream << "ShowdownServiceInstance.writeToBattle('" << id << "', '" << message << "');";
 
-    // Write to a battle stream using its uuid
+    // Write to a battle stream using its uuid if it exists
     auto r = qjs::JS_Eval( this->pimpl->ctx_, js_sstream.str().c_str(), js_sstream.str().length(),
                            "", JS_EVAL_TYPE_GLOBAL );
     qjs::JS_FreeValue( this->pimpl->ctx_, r );
