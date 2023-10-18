@@ -11,6 +11,7 @@
 #include <random>     // std::random_device, std::mt19937, std::uniform_int_distribution
 #include <sstream>    // std::stringstream
 #include <string>     // std::string
+#include <cstring>    // std::strlen
 
 /**
  * @brief Manages Pokémon Showdown battle streams running in an embedded JavaScript context.

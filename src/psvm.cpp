@@ -145,7 +145,7 @@ ShowdownService::ShowdownService() : pimpl( new impl )
 
     // Initialize ShowdownService instance
     auto create_sim_eval = "globalThis.ShowdownServiceInstance = new psvm.ShowdownService();";
-    auto r = qjs::JS_Eval( this->pimpl->ctx_, create_sim_eval, strlen( create_sim_eval ), "",
+    auto r = qjs::JS_Eval( this->pimpl->ctx_, create_sim_eval, std::strlen( create_sim_eval ), "",
                            JS_EVAL_TYPE_GLOBAL );
     qjs::JS_FreeValue( this->pimpl->ctx_, r );
 
