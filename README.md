@@ -47,4 +47,4 @@ under the MIT license.
 
 [bellard/quickjs](https://github.com/bellard/quickjs) is distributed under the MIT license.
 
-PSVM itself is distributed under the [GPL-3.0-Only](https://choosealicense.com/licenses/gpl-3.0/) license.
+PSVM itself is distributed under the MIT license.
