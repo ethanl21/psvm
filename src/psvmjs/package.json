@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "devDependencies": {
     "@sprout2000/esbuild-copy-plugin": "^1.1.13",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -24,6 +24,7 @@
     "@pkmn/randoms": "^0.8.7",
     "@pkmn/sim": "^0.8.7",
     "@pkmn/streams": "^1.1.0",
-    "nanoid": "^5.0.5"
+    "nanoid": "^5.0.5",
+    "polyfill-crypto.getrandomvalues": "^1.0.0"
   }
 }

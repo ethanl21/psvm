@@ -28,5 +28,6 @@ int main() {
         ss.WriteMessage(battle_id, line);
     }
 
+
     return 0;
 }

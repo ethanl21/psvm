@@ -122,20 +122,30 @@ ShowdownService::~ShowdownService()
 
 std::string ShowdownService::CreateBattle()
 {
-    // Generate a uuid with stduuid
-    auto battle_id = this->generate_uuidv4();
+    qjs::JSValue global_obj = qjs::JS_GetGlobalObject(this->pimpl->ctx_);
+    qjs::JSValue my_instance = qjs::JS_GetPropertyStr(this->pimpl->ctx_, global_obj, "ShowdownServiceInstance");
 
-    // Construct the JS code used to create a new battle
-    std::stringstream js_sstream;
-    js_sstream << "ShowdownServiceInstance.startBattle('" << battle_id << "');";
+    qjs::JSValue js_nanoid_func = qjs::JS_GetPropertyStr(this->pimpl->ctx_, my_instance, "startBattle");
 
-    // Create a new battle using the generated uuid
-    auto r = qjs::JS_Eval( this->pimpl->ctx_, js_sstream.str().c_str(), js_sstream.str().length(),
-                           "", JS_EVAL_TYPE_GLOBAL );
-    qjs::JS_FreeValue( this->pimpl->ctx_, r );
-    qjs::js_std_loop( this->pimpl->ctx_ );
+    qjs::JSValue result = qjs::JS_Call(this->pimpl->ctx_, js_nanoid_func, my_instance, 0, nullptr);
 
-    return battle_id;
+    std::string new_id;
+
+    if (!qjs::JS_IsException(result)) {
+        const char *message = qjs::JS_ToCString(this->pimpl->ctx_, result);
+        new_id = std::string(message);
+        qjs::JS_FreeCString(this->pimpl->ctx_, message);
+
+    } else {
+        // debug, todo handle the exception instead
+        new_id = std::string("-1");
+    }
+
+    qjs::JS_FreeValue(this->pimpl->ctx_, result );
+    qjs::JS_FreeValue(this->pimpl->ctx_, js_nanoid_func );
+    qjs::JS_FreeValue(this->pimpl->ctx_, my_instance );
+    qjs::JS_FreeValue(this->pimpl->ctx_, global_obj );
+    return new_id;
 }
 
 void ShowdownService::DeleteBattle( const std::string &id )
@@ -188,42 +198,4 @@ void ShowdownService::setSimulatorOnResponseCallback(
 void ShowdownService::clearSimulatorOnResponseCallback()
 {
     this->on_msg_received_callback_.reset();
-}
-
-std::string ShowdownService::generate_uuidv4()
-{
-    std::random_device rd;
-    std::mt19937 gen( rd() );
-    std::uniform_int_distribution<> dis( 0, 15 );
-    std::uniform_int_distribution<> dis2( 8, 11 );
-
-    std::stringstream ss;
-    int i;
-    ss << std::hex;
-    for ( i = 0; i < 8; i++ )
-    {
-        ss << dis( gen );
-    }
-    ss << "-";
-    for ( i = 0; i < 4; i++ )
-    {
-        ss << dis( gen );
-    }
-    ss << "-4";
-    for ( i = 0; i < 3; i++ )
-    {
-        ss << dis( gen );
-    }
-    ss << "-";
-    ss << dis2( gen );
-    for ( i = 0; i < 3; i++ )
-    {
-        ss << dis( gen );
-    }
-    ss << "-";
-    for ( i = 0; i < 12; i++ )
-    {
-        ss << dis( gen );
-    };
-    return ss.str();
 }
