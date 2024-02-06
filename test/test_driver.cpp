@@ -23,6 +23,8 @@ int main() {
     // Create a battle and store its id
     auto battle_id = ss.CreateBattle();
 
+    std::cout << "battle_id: " << battle_id << std::endl;
+
     // Write all the test lines to the battle stream
     for (const auto &line: SIM_TEST_LINES) {
         ss.WriteMessage(battle_id, line);

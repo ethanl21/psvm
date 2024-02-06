@@ -39,27 +39,72 @@ public:
         this->rt_ = qjs::JS_NewRuntime();
         this->ctx_ = qjs::JS_NewContext( this->rt_ );
 
-        // Add the response callback wrapper to the global scope in the JS context
-        auto global = qjs::JS_GetGlobalObject( this->ctx_ );
+        // store reference to globalThis
+        this->js_globalThis = qjs::JS_GetGlobalObject( this->ctx_ );
 
+        // Add callback wrapper to the global namespace
+        // TODO change this to set a callback member in the class
         qjs::JS_SetPropertyStr(
-            this->ctx_, global, "ResponseCallback",
+            this->ctx_, this->js_globalThis, "ResponseCallback",
             qjs::JS_NewCFunction( this->ctx_, impl::callback_wrapper_, "ResponseCallback", 3 ) );
-        qjs::JS_FreeValue( this->ctx_, global );
+
+        // Add ShowdownService class to global namespace
+        qjs::js_std_eval_binary( this->ctx_, psvmjs::qjsc_psvm, psvmjs::qjsc_psvm_size, 0 );
+        qjs::js_std_eval_binary( this->ctx_, psvmjs::qjsc_globalize, psvmjs::qjsc_globalize_size,
+                                 0 );
+
+        qjs::JSValue showdownServiceCtor =
+            qjs::JS_GetPropertyStr( this->ctx_, this->js_globalThis, "ShowdownService" );
+        this->js_showdownService =
+            qjs::JS_CallConstructor( this->ctx_, showdownServiceCtor, 0, nullptr );
+
+        qjs::JS_FreeValue( this->ctx_, showdownServiceCtor );
+
+        // Store references to the ShowdownService JS class instance's methods
+        this->js_startBattle =
+            qjs::JS_GetPropertyStr( this->ctx_, this->js_showdownService, "startBattle" );
+        this->js_killBattle =
+            qjs::JS_GetPropertyStr( this->ctx_, this->js_showdownService, "killBattle" );
+        this->js_killAllBattles =
+            qjs::JS_GetPropertyStr( this->ctx_, this->js_showdownService, "killAllBattles" );
+        this->js_writeToBattle =
+            qjs::JS_GetPropertyStr( this->ctx_, this->js_showdownService, "writeToBattle" );
     }
 
     ~impl()
     {
-        // make sure all the JS events have been executed
-        qjs::js_std_loop( this->ctx_ );
+        // Free function refs
+        qjs::JS_FreeValue( this->ctx_, this->js_startBattle );
+        qjs::JS_FreeValue( this->ctx_, this->js_killBattle );
+        qjs::JS_FreeValue( this->ctx_, this->js_killAllBattles );
+        qjs::JS_FreeValue( this->ctx_, this->js_writeToBattle );
+
+        // free ShowdownService instance red
+        qjs::JS_FreeValue( this->ctx_, this->js_showdownService );
+
+        // Free globalThis JSValue
+        qjs::JS_FreeValue( this->ctx_, this->js_globalThis );
 
         // Free the JS context and runtime
         qjs::JS_FreeContext( this->ctx_ );
         qjs::JS_FreeRuntime( this->rt_ );
     }
 
+    // qjs context and runtime ptrs
     qjs::JSRuntime *rt_;
     qjs::JSContext *ctx_;
+
+    // JS globalThis
+    qjs::JSValue js_globalThis;
+
+    // JS ShowdownService instance
+    qjs::JSValue js_showdownService;
+
+    // ShowdownService JS class instance methods
+    qjs::JSValue js_startBattle;
+    qjs::JSValue js_killBattle;
+    qjs::JSValue js_killAllBattles;
+    qjs::JSValue js_writeToBattle;
 
     static qjs::JSValue callback_wrapper_( qjs::JSContext *_ctx, qjs::JSValue this_val, int argc,
                                            qjs::JSValue *argv )
@@ -96,20 +141,6 @@ public:
 
 ShowdownService::ShowdownService() : pimpl( new impl )
 {
-    // Add ShowdownService class to global namespace
-    qjs::js_std_eval_binary( this->pimpl->ctx_, psvmjs::qjsc_psvm, psvmjs::qjsc_psvm_size, 0 );
-    qjs::js_std_eval_binary( this->pimpl->ctx_, psvmjs::qjsc_globalize, psvmjs::qjsc_globalize_size,
-                             0 );
-
-    // Initialize ShowdownService instance
-    auto create_sim_eval = "globalThis.ShowdownServiceInstance = new psvm.ShowdownService();";
-    auto r = qjs::JS_Eval( this->pimpl->ctx_, create_sim_eval, std::strlen( create_sim_eval ), "",
-                           JS_EVAL_TYPE_GLOBAL );
-    qjs::JS_FreeValue( this->pimpl->ctx_, r );
-
-    // Execute JS event loop
-    qjs::js_std_loop( this->pimpl->ctx_ );
-
     // TODO: throw an exception if there's already an existing ShowdownService instance
     // Add this instance to the file scope
     g_ShowdownService = this;
@@ -122,71 +153,67 @@ ShowdownService::~ShowdownService()
 
 std::string ShowdownService::CreateBattle()
 {
-    qjs::JSValue global_obj = qjs::JS_GetGlobalObject(this->pimpl->ctx_);
-    qjs::JSValue my_instance = qjs::JS_GetPropertyStr(this->pimpl->ctx_, global_obj, "ShowdownServiceInstance");
-
-    qjs::JSValue js_nanoid_func = qjs::JS_GetPropertyStr(this->pimpl->ctx_, my_instance, "startBattle");
-
-    qjs::JSValue result = qjs::JS_Call(this->pimpl->ctx_, js_nanoid_func, my_instance, 0, nullptr);
+    // call the "startBattle" fn and store the nanoid result
+    qjs::JSValue result = qjs::JS_Call( this->pimpl->ctx_, this->pimpl->js_startBattle,
+                                        this->pimpl->js_showdownService, 0, nullptr );
 
     std::string new_id;
 
-    if (!qjs::JS_IsException(result)) {
-        const char *message = qjs::JS_ToCString(this->pimpl->ctx_, result);
-        new_id = std::string(message);
-        qjs::JS_FreeCString(this->pimpl->ctx_, message);
-
-    } else {
+    if ( !qjs::JS_IsException( result ) )
+    {
+        const char *message = qjs::JS_ToCString( this->pimpl->ctx_, result );
+        new_id = std::string( message );
+        qjs::JS_FreeCString( this->pimpl->ctx_, message );
+    }
+    else
+    {
         // debug, todo handle the exception instead
-        new_id = std::string("-1");
+        new_id = std::string( "-1" );
     }
 
-    qjs::JS_FreeValue(this->pimpl->ctx_, result );
-    qjs::JS_FreeValue(this->pimpl->ctx_, js_nanoid_func );
-    qjs::JS_FreeValue(this->pimpl->ctx_, my_instance );
-    qjs::JS_FreeValue(this->pimpl->ctx_, global_obj );
     return new_id;
 }
 
 void ShowdownService::DeleteBattle( const std::string &id )
 {
-    // Construct the JS code used to kill a battle stream
-    std::stringstream js_sstream;
-    js_sstream << "ShowdownServiceInstance.killBattle('" << id << "');";
 
-    // Write delete a battle stream using its uuid if it exists
-    auto r = qjs::JS_Eval( this->pimpl->ctx_, js_sstream.str().c_str(), js_sstream.str().length(),
-                           "", JS_EVAL_TYPE_GLOBAL );
-    qjs::JS_FreeValue( this->pimpl->ctx_, r );
+    // arguments array (battle id to delete)
+    qjs::JSValue args[1];
+    args[0] = qjs::JS_NewString( this->pimpl->ctx_, id.c_str() );
 
-    qjs::js_std_loop( this->pimpl->ctx_ );
+    // todo: return success or failure instead of nothing
+
+    qjs::JS_Call( this->pimpl->ctx_, this->pimpl->js_killBattle, this->pimpl->js_showdownService, 1,
+                  args );
+
+    // free the arguments array
+    qjs::JS_FreeValue( this->pimpl->ctx_, args[0] );
 }
 
 void ShowdownService::DeleteAllBattles()
 {
-    // Construct the JS code used to kill a battle stream
-    auto delete_all_eval = "ShowdownServiceInstance.killAllBattles();";
+    // call killAllBattles
+    qjs::JS_Call( this->pimpl->ctx_, this->pimpl->js_killAllBattles,
+                  this->pimpl->js_showdownService, 0, nullptr );
 
-    // Kill all battle streams
-    auto r = qjs::JS_Eval( this->pimpl->ctx_, delete_all_eval, std::strlen( delete_all_eval ), "",
-                           JS_EVAL_TYPE_GLOBAL );
-    qjs::JS_FreeValue( this->pimpl->ctx_, r );
-
-    qjs::js_std_loop( this->pimpl->ctx_ );
+    // todo: return success or failure instead of nothing
 }
 
 void ShowdownService::WriteMessage( const std::string &id, const std::string &message )
 {
-    // Construct the JS code used to write to a battle stream
-    std::stringstream js_sstream;
-    js_sstream << "ShowdownServiceInstance.writeToBattle('" << id << "', '" << message << "');";
+    // construct args array
+    qjs::JSValue args[2];
+    args[0] = qjs::JS_NewString( this->pimpl->ctx_, id.c_str() );
+    args[1] = qjs::JS_NewString( this->pimpl->ctx_, message.c_str() );
 
-    // Write to a battle stream using its uuid if it exists
-    auto r = qjs::JS_Eval( this->pimpl->ctx_, js_sstream.str().c_str(), js_sstream.str().length(),
-                           "", JS_EVAL_TYPE_GLOBAL );
-    qjs::JS_FreeValue( this->pimpl->ctx_, r );
+    qjs::JS_Call( this->pimpl->ctx_, this->pimpl->js_writeToBattle, this->pimpl->js_showdownService,
+                  2, args );
 
     qjs::js_std_loop( this->pimpl->ctx_ );
+
+    // free the arguments array
+    qjs::JS_FreeValue( this->pimpl->ctx_, args[0] );
+    qjs::JS_FreeValue( this->pimpl->ctx_, args[1] );
 }
 
 void ShowdownService::setSimulatorOnResponseCallback(
