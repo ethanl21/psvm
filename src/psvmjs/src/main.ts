@@ -1,7 +1,5 @@
-// @ts-ignore
-import {BattleStreams} from "@pkmn/sim";
-// @ts-ignore
-import {ObjectReadWriteStream} from "@pkmn/streams";
+import { BattleStreams } from "@pkmn/sim";
+import { ObjectReadWriteStream } from "@pkmn/streams";
 
 /**
  * @file main.ts
@@ -30,7 +28,7 @@ export class ShowdownService {
 
     // Create the battle streams
     const streams = BattleStreams.getPlayerStreams(
-      new BattleStreams.BattleStream()
+      new BattleStreams.BattleStream(),
     );
 
     // Add the omniscient stream to the streams dict
@@ -38,8 +36,7 @@ export class ShowdownService {
 
     // Write the output to the output function
     void (async (id) => {
-      for await(const chunk of streams.omniscient) {
-        // @ts-ignore
+      for await (const chunk of streams.omniscient) {
         ResponseCallback(id, chunk);
       }
     })(id);
