@@ -3,6 +3,3 @@
 	url = https://github.com/c-smile/quickjspp.git
 	branch = master
 	ignore = dirty
-[submodule "extern/quickjs"]
-	path = extern/quickjs
-	url = https://github.com/bellard/quickjs
