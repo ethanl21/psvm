@@ -10,7 +10,7 @@ endif ()
 
 set(quickjs_src quickjs.c libbf.c libunicode.c libregexp.c cutils.c quickjs-libc.c)
 
-set(prefix "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/")
+set(prefix "${CMAKE_CURRENT_SOURCE_DIR}/quickjs/")
 set(prefixed_srcs)
 
 foreach (item ${quickjs_src})
@@ -31,7 +31,7 @@ if(UNIX)
     target_compile_definitions(quickjs-dumpleaks PRIVATE _GNU_SOURCE)
 endif ()
 
-add_executable(qjsc "${CMAKE_CURRENT_SOURCE_DIR}/quickjspp/qjsc.c")
+add_executable(qjsc "${CMAKE_CURRENT_SOURCE_DIR}/quickjs/qjsc.c")
 target_link_libraries(qjsc PRIVATE quickjs)
 
 if (UNIX AND NOT APPLE)
