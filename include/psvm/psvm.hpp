@@ -31,7 +31,7 @@ public:
 
     /**
      * @brief Creates a new battle stream
-     * @return UUID used to identify the new battle
+     * @return nanoid used to identify the new battle
      */
     std::string CreateBattle();
 
@@ -48,7 +48,7 @@ public:
 
     /**
      * @brief Writes a line to a battle stream
-     * @param id UUID of the battle to write to
+     * @param id ID of the battle to write to
      * @param message Line to write to the battle stream. '\\n' will be appended to the end of the
      * string if it is missing.
      */
@@ -73,8 +73,6 @@ private:
     class impl;
 
     std::unique_ptr<impl> pimpl;
-
-    static std::string generate_uuidv4();
 
     /// \endcond
 

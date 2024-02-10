@@ -1,5 +1,0 @@
-[submodule "extern/quickjspp"]
-	path = extern/quickjspp
-	url = https://github.com/c-smile/quickjspp.git
-	branch = master
-	ignore = dirty

@@ -1,5 +1,4 @@
 .vscode
 .idea
-cmake-build-debug
-cmake-build-release
-src/psvmjs.c
+builddir
+subprojects/quickjs
