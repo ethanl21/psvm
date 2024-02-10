@@ -1,0 +1,10 @@
+diff --git a/meson.build b/meson.build
+index 0ba2d48..f90b9dd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -103,3 +103,5 @@ pkg.generate(quickjs,
+ )
+ 
+ meson.override_dependency('quickjs', quickjs_dep)
++
++qjsc_exe = executable('qjsc', 'qjsc.c', dependencies: [quickjs_dep])
