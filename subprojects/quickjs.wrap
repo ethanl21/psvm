@@ -1,0 +1,6 @@
+[wrap-git]
+url = https://github.com/frida/quickjs.git
+revision = d2c302c54069cbd070a01162ca022cbc716b655c
+depth = 1
+
+diff_files = quickjs/build_qjsc.diff
