@@ -18,12 +18,9 @@ engine that supports native C++ modules. An example Godot 4 integration is plann
 
 ### Todo
 
-- [ ] Replace c-smile/quickjspp with suchipi/quickjs
+- [ ] Replace c-smile/quickjspp with frida/quickjs
+- [ ] Migrate CMake build process to Meson
 - [ ] Handle simulator response callback correctly instead of the current way
-- [ ] Split build process into three steps
-    - [ ] Compile suchipi/quickjs for Windows, macOS, Linux using Docker or directly on Unix
-    - [ ] Bundle the Typescript project and transform it into bytecode using suchipi/quickjs's bytecode compiler
-    - [ ] Compile psvm using suchipi/quickjs' static library, the Typescript bytecode, and PSVM's source
 - [ ] Update documentation
 - [ ] Add error handling to ShowdownService (both cpp and ts)
 - [ ] Rename cpp or ts class for clarity
