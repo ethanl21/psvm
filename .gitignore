@@ -2,3 +2,4 @@
 .idea
 builddir
 subprojects/quickjs
+psvmjs.c
