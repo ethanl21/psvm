@@ -3,8 +3,12 @@ import { ObjectReadWriteStream } from "@pkmn/streams";
 import { nanoid } from "nanoid";
 
 // crypto is not implemented for QuickJS. this is a hack to make nanoid work
-// @ts-ignore
-globalThis.crypto = { getRandomValues: require('polyfill-crypto.getrandomvalues') }
+// @ts-expect-error getRandomValues is the only crypto function we need
+globalThis.crypto = {
+  getRandomValues: require("polyfill-crypto.getrandomvalues"),
+};
+
+declare function ResponseCallback(id: string, chunk: string): undefined;
 
 /**
  * @file main.ts
@@ -46,7 +50,6 @@ export class ShowdownService {
     // Write the output to the output function
     void (async (id) => {
       for await (const chunk of streams.omniscient) {
-
         // todo: add callback fn wrapper as a member of this class instead of a global fn
         ResponseCallback(id, chunk);
       }
