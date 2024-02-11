@@ -1,14 +1,7 @@
 import { BattleStreams } from "@pkmn/sim";
 import { ObjectReadWriteStream } from "@pkmn/streams";
-import { nanoid } from "nanoid";
 
-// crypto is not implemented for QuickJS. this is a hack to make nanoid work
-// @ts-expect-error getRandomValues is the only crypto function we need
-globalThis.crypto = {
-  getRandomValues: require("polyfill-crypto.getrandomvalues"),
-};
-
-declare function ResponseCallback(id: string, chunk: string): undefined;
+//declare function ResponseCallback(id: string, chunk: string): undefined;
 
 /**
  * @file main.ts
@@ -30,13 +23,8 @@ export class ShowdownService {
   /**
    * @brief Starts a new battle
    */
-  startBattle() {
-    // generate a nanoid
-    const id = nanoid();
-
+  startBattle(id: string) {
     // Delete the battle stream if it already exists
-    // There shouldn't be enough battles happening concurrently for collision to occur,
-    // but technically it's possible
     this.battle_dict.delete(id);
 
     // Create the battle streams

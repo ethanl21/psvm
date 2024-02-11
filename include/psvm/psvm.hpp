@@ -31,7 +31,7 @@ public:
 
     /**
      * @brief Creates a new battle stream
-     * @return nanoid used to identify the new battle
+     * @return UUID used to identify the new battle, or "-1" if error
      */
     std::string CreateBattle();
 

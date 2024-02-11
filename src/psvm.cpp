@@ -4,15 +4,15 @@
  * @brief implementation of ShowdownService
  */
 
-#include <psvm/psvm.hpp>
+#include <psvm/psvm.hpp> // ShowdownService
+#include <uuid.h> // stduuid
 
 // qjsc compiled bytecode
 namespace psvmjs
 {
     extern "C"
     {
-
-#include "psvmjs.c"
+#include <psvmjs.h>
     };
 }
 
@@ -153,17 +153,24 @@ ShowdownService::~ShowdownService()
 
 std::string ShowdownService::CreateBattle()
 {
+    // generate a new uuid
+    uuids::uuid const battle_id = uuids::uuid_system_generator{}();
+    std::string const battle_id_str = uuids::to_string(battle_id);
+
+    qjs::JSValue args[1];
+    args[0] = qjs::JS_NewString(this->pimpl->ctx_, battle_id_str.c_str());
+
     // call the "startBattle" fn and store the nanoid result
     qjs::JSValue result = qjs::JS_Call(this->pimpl->ctx_, this->pimpl->js_startBattle,
-                                       this->pimpl->js_showdownService, 0, nullptr);
+                                       this->pimpl->js_showdownService, 1, args);
+    // free the arguments array
+    qjs::JS_FreeValue(this->pimpl->ctx_, args[0]);
 
     std::string new_id;
 
     if (!qjs::JS_IsException(result))
     {
-        const char *message = qjs::JS_ToCString(this->pimpl->ctx_, result);
-        new_id = std::string(message);
-        qjs::JS_FreeCString(this->pimpl->ctx_, message);
+        new_id = battle_id_str;
     }
     else
     {

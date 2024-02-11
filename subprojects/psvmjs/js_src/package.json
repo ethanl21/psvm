@@ -24,8 +24,6 @@
   "dependencies": {
     "@pkmn/randoms": "^0.8.7",
     "@pkmn/sim": "^0.8.7",
-    "@pkmn/streams": "^1.1.0",
-    "nanoid": "^5.0.5",
-    "polyfill-crypto.getrandomvalues": "^1.0.0"
+    "@pkmn/streams": "^1.1.0"
   }
 }
