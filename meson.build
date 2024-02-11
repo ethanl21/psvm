@@ -3,6 +3,8 @@ project('psvm', ['cpp', 'c'], version: '0.1',
         'cpp_std=c++17',
         'c_std=c99',
         'default_library=static',
+        'quickjs:default_library=static',
+        'psvmjs:default_library=static',
         'stduuid:using_cxx20_span=disabled'
         ]
     )
@@ -27,5 +29,9 @@ stduuid_dep = stduuid_proj.get_variable('stduuid_dep')
 # psvm library
 psvm_inc = include_directories('include')
 psvm_lib = library('psvm', sources: ['src/psvm.cpp'], dependencies: [quickjs_dep, psvmjs_dep, stduuid_dep], include_directories: psvm_inc)
+psvm_dep = declare_dependency(
+    include_directories: psvm_inc,
+    link_with: psvm_lib
+)
 
-executable('psvm_test_driver', sources: ['test/test_driver.cpp'], link_with: [psvm_lib], include_directories: psvm_inc)
+executable('psvm_test_driver', sources: ['test/test_driver.cpp'], dependencies: psvm_dep)

@@ -20,20 +20,47 @@ engine that supports native C++ modules. An example Godot 4 integration is plann
 
 To build PSVM, Node.js and Meson are required.
 
-To build the test driver program:
+### Instructions
 
 ```bash
-# Clone the repository with submodules
-git clone
-cd psvm
-
 # build psvm
 # (in the root directory)
 meson setup builddir
 meson compile -C builddir
 ```
 
+PSVM is built as a static library by default. To build as a shared library:
+
+```bash
+# build psvm
+# (in the root directory)
+meson setup builddir -Ddefault_library=shared
+meson compile -C builddir
+```
+
 A compiled test driver executable will be located at `builddir/psvm_test_driver`.
+
+## Usage
+
+To use PSVM in a Meson project, add `psvm.wrap` to the `subprojects` directory in your project's root with the following contents:
+
+```
+[wrap-git]
+url = https://github.com/ethanl21/psvm.git
+revision = head
+depth = 1
+```
+
+(Replace `head` with a commit hash to use a specific version.)
+
+Then you can link to PSVM in your `build.meson` file.
+
+```
+psvm_proj = subproject('psvm')
+psvm_dep = stduuid_proj.get_variable('psvm_dep')
+
+executable('my_program', sources: ['...'], dependencies: ['psvm_dep'])
+```
 
 ## Attribution
 

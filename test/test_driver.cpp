@@ -8,27 +8,22 @@ const std::vector<std::string> SIM_TEST_LINES = {
     R"(>player p2 {"name":"Bot 2","team":"Jolteon||Leftovers|VoltAbsorb|substitute,terablast,calmmind,thunderbolt||85,,85,85,85,85||,0,,,,||84|,,,,,Ice]Greedent||SitrusBerry|CheekPouch|bodyslam,earthquake,psychicfangs,swordsdance||85,85,85,85,85,85||||87|,,,,,Psychic]Lurantis||Leftovers|Contrary|knockoff,leafstorm,synthesis,superpower||85,85,85,85,85,85||||91|,,,,,Fighting]Polteageist||WhiteHerb|CursedBody|shadowball,storedpower,gigadrain,shellsmash||85,,85,85,85,85|N|,0,,,,||79|,,,,,Psychic]Gurdurr||Eviolite|Guts|drainpunch,knockoff,machpunch,bulkup||85,85,85,85,85,85||||85|,,,,,Steel]Glastrier||ChoiceBand|ChillingNeigh|iciclecrash,highhorsepower,closecombat,heavyslam||81,85,85,85,85,85|N|||86|,,,,,Fighting"})",
 };
 
-int main()
-{
+int main() {
     // Create a new ShowdownService
     ShowdownService ss;
 
     // Demo callback function, prints to stdout
-    std::function<void(std::string, std::string)> callback = [](const std::string &id, const std::string &msg)
-    {
+    const std::function<void(std::string, std::string)> callback = [](const std::string &id, const std::string &msg) {
         std::cout << "[" << id << "]\n"
-                  << msg << "\n";
+                << msg << "\n";
     };
     ss.setSimulatorOnResponseCallback(callback);
 
     // Create a battle and store its id
-    auto battle_id = ss.CreateBattle();
-
-    std::cout << "battle_id: " << battle_id << std::endl;
+    const auto battle_id = ss.CreateBattle();
 
     // Write all the test lines to the battle stream
-    for (const auto &line : SIM_TEST_LINES)
-    {
+    for (const auto &line: SIM_TEST_LINES) {
         ss.WriteMessage(battle_id, line);
     }
 
