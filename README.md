@@ -10,23 +10,11 @@ PSVM is Pokémon Showdown's simulator compiled to native code with no runtime Ja
 ### Details
 
 PSVM consists of [Smogon's Pokémon Showdown battle engine](https://github.com/smogon/pokemon-showdown) bundled
-by [esbuild](https://esbuild.github.io) for [QuickJS](https://github.com/bellard/quickjs).
+by [esbuild](https://esbuild.github.io) for [QuickJS](https://github.com/frida/quickjs).
 
 PSVM is intended to be used as a battle engine for Pokémon fangames, similar to Essentials' PBS. It has no runtime
 Javascript engine dependency and isn't made for a specific game engine, so it should be easy enough to add to any game
 engine that supports native C++ modules. An example Godot 4 integration is planned.
-
-### Todo
-
-- [x] Replace c-smile/quickjspp with frida/quickjs
-- [x] Migrate CMake build process to Meson
-- [ ] Handle simulator response callback correctly instead of the current way
-- [ ] Update documentation
-- [ ] Add error handling to ShowdownService (both cpp and ts)
-- [ ] Rename cpp or ts class for clarity
-- [ ] Update README
-- [ ] Use a real random number generator instead of the polyfill hack
-- [ ] Implement tests properly and not the hacky way
 
 ## Building
 
