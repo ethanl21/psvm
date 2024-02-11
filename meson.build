@@ -2,7 +2,9 @@ project('psvm', ['cpp', 'c'], version: '0.1',
     default_options : [
         'cpp_std=c++17',
         'c_std=c99',
+        'default_library=static',
         'quickjs:default_library=static',
+        'psvmjs:default_library=static',
         'stduuid:using_cxx20_span=disabled'
         ]
     )
