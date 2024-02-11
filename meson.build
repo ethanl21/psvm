@@ -13,8 +13,11 @@ quickjs_dep = quickjs_proj.get_variable('quickjs_dep')
 
 # psvm js bytecode subproject
 psvmjs_proj = subproject('psvmjs')
-#psvmjs_ct = psvmjs_proj.get_variable('psvmjs_ct')
 psvmjs_dep = psvmjs_proj.get_variable('psvmjs_dep')
+
+# stduuid wrap subproject
+stduuid_proj = subproject('stduuid')
+
 
 # psvm library
 psvm_inc = include_directories('include')
