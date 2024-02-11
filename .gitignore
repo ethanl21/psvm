@@ -1,5 +1,14 @@
+# IDE Files
 .vscode
 .idea
-builddir
+
+# Meson Wrap dependencies
 subprojects/quickjs
+subprojects/stduuid-*
+subprojects/packagecache
+
+# Meson build output
+builddir
+
+# psvmjs bytecode
 psvmjs.c
