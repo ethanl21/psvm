@@ -5,13 +5,14 @@ project('psvm', ['cpp', 'c'], version: '0.1',
         'default_library=static',
         'quickjs:default_library=static',
         'psvmjs:default_library=static',
-        'stduuid:using_cxx20_span=disabled'
         ]
     )
 
-if build_machine.system() == 'darwin'
-  add_global_arguments(['-arch', 'x86_64', '-arch', 'arm64'], language: ['c', 'cpp', 'objcpp'])
-  add_global_link_arguments(['-arch', 'x86_64', '-arch', 'arm64'], language: ['c', 'cpp', 'objcpp'])
+if meson.is_subproject() == false
+    if build_machine.system() == 'darwin'
+        add_global_arguments(['-arch', 'x86_64', '-arch', 'arm64'], language: ['c', 'cpp', 'objcpp'])
+        add_global_link_arguments(['-arch', 'x86_64', '-arch', 'arm64'], language: ['c', 'cpp', 'objcpp'])
+    endif
 endif
 
 # frida/quickjs wrap subproject
@@ -23,7 +24,7 @@ psvmjs_proj = subproject('psvmjs')
 psvmjs_dep = psvmjs_proj.get_variable('psvmjs_dep')
 
 # stduuid wrap subproject
-stduuid_proj = subproject('stduuid')
+stduuid_proj = subproject('stduuid', default_options: ['using_cxx20_span=disabled'])
 stduuid_dep = stduuid_proj.get_variable('stduuid_dep')
 
 # psvm library
