@@ -29,5 +29,9 @@ stduuid_dep = stduuid_proj.get_variable('stduuid_dep')
 # psvm library
 psvm_inc = include_directories('include')
 psvm_lib = library('psvm', sources: ['src/psvm.cpp'], dependencies: [quickjs_dep, psvmjs_dep, stduuid_dep], include_directories: psvm_inc)
+psvm_dep = declare_dependency(
+    include_directories: psvm_inc,
+    link_with: psvm_lib
+)
 
-executable('psvm_test_driver', sources: ['test/test_driver.cpp'], link_with: [psvm_lib], include_directories: psvm_inc)
+executable('psvm_test_driver', sources: ['test/test_driver.cpp'], dependencies: psvm_dep)
