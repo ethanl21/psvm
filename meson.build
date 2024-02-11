@@ -1,11 +1,16 @@
 project('psvm', ['cpp', 'c'], version: '0.1',
     default_options : [
-        #'warning_level=1',
         'cpp_std=c++17',
-        'c_std=c11',
-        'default_library=static'
+        'c_std=c99',
+        'default_library=static',
+        'stduuid:using_cxx20_span=disabled'
         ]
     )
+
+if build_machine.system() == 'darwin'
+  add_global_arguments(['-arch', 'x86_64', '-arch', 'arm64'], language: ['c', 'cpp', 'objcpp'])
+  add_global_link_arguments(['-arch', 'x86_64', '-arch', 'arm64'], language: ['c', 'cpp', 'objcpp'])
+endif
 
 # frida/quickjs wrap subproject
 quickjs_proj = subproject('quickjs')
