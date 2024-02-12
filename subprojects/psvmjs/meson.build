@@ -11,7 +11,7 @@ qjsc_exe = quickjs_proj.get_variable('qjsc_exe')
 psvmjs_ct = custom_target('psvmjs_build',
     depends: qjsc_exe,
     input: 'meson_wrapper.py',
-    command: [python_exe, '@INPUT@'],
+    command: [python_exe, '@INPUT@', meson.current_source_dir(), meson.current_build_dir(), qjsc_exe.full_path()],
     output: ['psvmjs.c'],
 )
 psvmjs_inc = include_directories('include')
