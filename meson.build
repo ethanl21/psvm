@@ -24,7 +24,7 @@ psvmjs_proj = subproject('psvmjs')
 psvmjs_dep = psvmjs_proj.get_variable('psvmjs_dep')
 
 # stduuid wrap subproject
-stduuid_proj = subproject('stduuid', default_options: ['using_cxx20_span=disabled'])
+stduuid_proj = subproject('stduuid', default_options: ['using_cxx20_span=disabled', 'tests=false'])
 stduuid_dep = stduuid_proj.get_variable('stduuid_dep')
 
 # psvm library
