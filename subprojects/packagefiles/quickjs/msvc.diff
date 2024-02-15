@@ -1,0 +1,141 @@
+diff --git a/cutils.c b/cutils.c
+index 09939a6..a20bed1 100644
+--- a/cutils.c
++++ b/cutils.c
+@@ -29,6 +29,28 @@
+ 
+ #include "cutils.h"
+ 
++#ifdef _MSC_VER
++
++// From: https://stackoverflow.com/a/26085827
++int gettimeofday(struct timeval *tp, struct timezone *tzp) {
++    static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
++
++    SYSTEMTIME system_time;
++    FILETIME file_time;
++    uint64_t time;
++
++    GetSystemTime(&system_time);
++    SystemTimeToFileTime(&system_time, &file_time);
++    time = ((uint64_t) file_time.dwLowDateTime);
++    time += ((uint64_t) file_time.dwHighDateTime) << 32;
++
++    tp->tv_sec = (long) ((time - EPOCH) / 10000000L);
++    tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
++
++    return 0;
++}
++#endif
++
+ void pstrcpy(char *buf, int buf_size, const char *str)
+ {
+     int c;
+diff --git a/meson.build b/meson.build
+index 0ba2d48..3fcae9b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -15,6 +15,11 @@ headers = [
+   'quickjs.h',
+ ]
+ 
++if cc.get_id() == 'msvc'
++  headers += 'msvc/dirent.h'
++  headers += 'msvc/getopt.h'
++endif
++
+ sources = [
+   'quickjs.c',
+   'libregexp.c',
+@@ -103,3 +108,5 @@ pkg.generate(quickjs,
+ )
+ 
+ meson.override_dependency('quickjs', quickjs_dep)
++
++qjsc_exe = executable('qjsc', 'qjsc.c', dependencies: [quickjs_dep])
+diff --git a/qjsc.c b/qjsc.c
+index f8e60b3..ba637d6 100644
+--- a/qjsc.c
++++ b/qjsc.c
+@@ -27,10 +27,13 @@
+ #include <inttypes.h>
+ #include <string.h>
+ #include <assert.h>
+-#include <unistd.h>
+ #include <errno.h>
+ #if !defined(_WIN32)
+ #include <sys/wait.h>
++#include <unistd.h>
++#else
++#include "msvc/getopt.h"
++#include <process.h>
+ #endif
+ 
+ #include "cutils.h"
+@@ -613,7 +616,7 @@ int main(int argc, char **argv)
+     if (output_type == OUTPUT_EXECUTABLE) {
+ #if defined(_WIN32) || defined(__ANDROID__)
+         /* XXX: find a /tmp directory ? */
+-        snprintf(cfilename, sizeof(cfilename), "out%d.c", getpid());
++        snprintf(cfilename, sizeof(cfilename), "out%d.c", _getpid());
+ #else
+         snprintf(cfilename, sizeof(cfilename), "/tmp/out%d.c", getpid());
+ #endif
+diff --git a/quickjs-libc.c b/quickjs-libc.c
+index af02408..440d337 100644
+--- a/quickjs-libc.c
++++ b/quickjs-libc.c
+@@ -22,30 +22,40 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  * THE SOFTWARE.
+  */
+-#include <stdlib.h>
+-#include <stdio.h>
+-#include <stdarg.h>
+-#include <inttypes.h>
+-#include <string.h>
+ #include <assert.h>
+-#include <unistd.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-#include <sys/time.h>
+-#include <time.h>
+-#include <signal.h>
++#include <inttypes.h>
+ #include <limits.h>
++#include <signal.h>
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
+ #include <sys/stat.h>
+-#include <dirent.h>
++#include <time.h>
+ #if defined(_WIN32)
+-#include <windows.h>
+ #include <conio.h>
+-#include <utime.h>
++#include <fcntl.h>
++#include <io.h>
++#include <sys/stat.h>
++#include <sys/types.h>
++#include <sys/utime.h>
++#include <windows.h>
++#include "msvc/dirent.h"
++#ifndef PATH_MAX
++#define PATH_MAX MAX_PATH
++#endif
++#define popen _popen
++#define pclose _pclose
+ #else
++#include <dirent.h>
+ #include <dlfcn.h>
+-#include <termios.h>
+ #include <sys/ioctl.h>
++#include <sys/time.h>
+ #include <sys/wait.h>
++#include <termios.h>
++#include <unistd.h>
+ 
+ #if defined(__APPLE__)
+ typedef sig_t sighandler_t;
