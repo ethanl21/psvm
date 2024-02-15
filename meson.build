@@ -8,15 +8,23 @@ project('psvm', ['cpp', 'c'], version: '0.1',
         ]
     )
 
+qjs_c_args = []
 if meson.is_subproject() == false
     if build_machine.system() == 'darwin'
         add_global_arguments(['-arch', 'x86_64', '-arch', 'arm64'], language: ['c', 'cpp', 'objcpp'])
         add_global_link_arguments(['-arch', 'x86_64', '-arch', 'arm64'], language: ['c', 'cpp', 'objcpp'])
     endif
+
+    if meson.get_compiler('c').get_id() == 'msvc'
+        qjs_c_args += [
+            '/wd4244',
+            '/wd4146'
+        ]
+    endif
 endif
 
 # frida/quickjs wrap subproject
-quickjs_proj = subproject('quickjs')
+quickjs_proj = subproject('quickjs', default_options: qjs_c_args)
 quickjs_dep = quickjs_proj.get_variable('quickjs_dep')
 
 # psvm js bytecode subproject
