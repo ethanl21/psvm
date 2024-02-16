@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. The format 
 
 ## [Unreleased]
 
+## [1.0.1] - 2024-02-16
+
+### Changed
+
+- Correctly use Meson's dependency system
+- Temporary disable building test driver
+
 ## [1.0.0] - 2024-02-16
 
 ### Added

@@ -13,17 +13,14 @@ if meson.is_subproject() == false
     endif
 endif
 
-# frida/quickjs wrap subproject
-quickjs_proj = subproject('quickjs', default_options: ['default_library=static'])
-quickjs_dep = quickjs_proj.get_variable('quickjs_dep')
+# bellard/quickjs wrap dependency
+quickjs_dep = dependency('quickjs', default_options: ['default_library=static'])
 
 # psvm js bytecode subproject
-psvmjs_proj = subproject('psvmjs', default_options: ['default_library=static'])
-psvmjs_dep = psvmjs_proj.get_variable('psvmjs_dep')
+psvmjs_dep = dependency('psvmjs', default_options: ['default_library=static'])
 
-# stduuid wrap subproject
-stduuid_proj = subproject('stduuid', default_options: ['using_cxx20_span=disabled', 'tests=false'])
-stduuid_dep = stduuid_proj.get_variable('stduuid_dep')
+# stduuid wrap dependency
+stduuid_dep = dependency('stduuid', default_options: ['using_cxx20_span=disabled', 'tests=false'])
 
 # psvm library
 psvm_inc = include_directories('include')
@@ -33,4 +30,6 @@ psvm_dep = declare_dependency(
     link_with: psvm_lib
 )
 
-executable('psvm_test_driver', sources: ['test/test_driver.cpp'], dependencies: psvm_dep)
+#executable('psvm_test_driver', sources: ['test/test_driver.cpp'], dependencies: psvm_dep)
+
+meson.override_dependency('psvm', psvm_dep)

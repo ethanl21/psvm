@@ -5,3 +5,8 @@ depth = 1
 
 patch_directory = quickjs/overlay
 diff_files = quickjs/version_conflict.diff
+
+[provide]
+quickjs = quickjs_dep
+qjsc = qjsc
+program_names = qjsc

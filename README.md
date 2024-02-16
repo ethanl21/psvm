@@ -54,9 +54,15 @@ To use PSVM in a Meson project, add `psvm.wrap` to the `subprojects` directory i
 
 ```
 [wrap-git]
+directory = psvm-1.0.0
 url = https://github.com/ethanl21/psvm.git
-revision = head
+revision = v1.0.0
+wrapdb_version = '1.0.0'
 depth = 1
+
+[provide]
+
+psvm = psvm_dep
 ```
 
 (Replace `head` with a commit hash to use a specific version.)
@@ -64,7 +70,6 @@ depth = 1
 Then you can link to PSVM in your `build.meson` file.
 
 ```
-psvm_proj = subproject('psvm')
 psvm_dep = dependency('psvm')
 
 executable('my_program', sources: ['...'], dependencies: ['psvm_dep'])

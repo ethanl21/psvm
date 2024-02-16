@@ -27,3 +27,5 @@ psvmjs_dep = declare_dependency(
     include_directories: psvmjs_inc,
     link_with: psvmjs_lib
 )
+
+meson.override_dependency('psvmjs', psvmjs_dep)
