@@ -47,7 +47,7 @@ cdata.set('CONFIG_BIGNUM', get_option('bignum'))
 atomics = false
 opt = get_option('atomics')
 if not opt.disabled()
-  supported = not (have_msvc or have_emscripten)
+  supported = not have_emscripten
   if opt.auto()
     atomics = supported
   elif supported
@@ -61,7 +61,7 @@ cdata.set('CONFIG_ATOMICS', atomics)
 stack_check = false
 opt = get_option('stack_check')
 if not opt.disabled()
-  supported = not (have_msvc or have_emscripten)
+  supported = not have_emscripten
   if opt.auto()
     stack_check = supported
   elif supported
@@ -79,7 +79,7 @@ configure_file(
   configuration: cdata,
 )
 add_project_arguments(
-  have_msvc ? '/FI' : '-include', meson.current_build_dir() / 'config.h',
+  '-include', meson.current_build_dir() / 'config.h',
   '-D_GNU_SOURCE=1',
   language: 'c',
 )
