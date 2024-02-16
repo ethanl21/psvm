@@ -18,14 +18,22 @@ engine that supports native C++ modules. An example Godot 4 integration is plann
 
 ## Building
 
-To build PSVM, Node.js and Meson are required. When compiling for Windows, MSVC is not supported.
-
+To build PSVM, Node.js and Meson are required. To compile for Windows, use the provided `cross/x86_64-w64-mingw32.txt` to cross compile on a Linux machine.
 ### Instructions
 
 ```bash
-# build psvm
-# (in the root directory)
-meson setup builddir
+git clone https://github.com/ethanl21/psvm.git
+cd psvm
+meson setup builddir --buildtype debug # or release
+meson compile -C builddir
+```
+
+#### For Windows
+
+```bash
+git clone https://github.com/ethanl21/psvm.git
+cd psvm
+meson setup --cross-file cross/x86_64-w64-mingw32.txt builddir --buildtype debug # or release
 meson compile -C builddir
 ```
 
