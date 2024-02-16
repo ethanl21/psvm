@@ -7,21 +7,21 @@ python_exe = find_program('python3', 'python')
 quickjs_proj = subproject('quickjs')
 qjsc_exe = quickjs_proj.get_variable('qjsc_exe')
 
-
 # bundle psvmjs
 psvmjs_ct = custom_target('psvmjs_build',
-    depends: qjsc_exe,
     input: 'meson_wrapper.py',
-    command: [python_exe, '@INPUT@'],
-    output: ['psvmjs.c'],
+    command: [python_exe, '@INPUT@', '@CURRENT_SOURCE_DIR@'],
+    output: ['psvm.js'],
 )
 
-run_command([qjsc_exe, '-c', '-o', meson.current_build_dir() + '/psvmjs.c', meson.current_source_dir() + '/js_src/dist/globalize.js', meson.current_source_dir() + '/js_src/dist/psvm.js'])
-
-
+psvmjs_c_ct = custom_target('psvmjs_bytecode',
+    depends: [qjsc_exe, psvmjs_ct],
+    command: [qjsc_exe, '-c', '-o', meson.current_build_dir() + '/psvmjs.c', meson.current_source_dir() + '/js_src/dist/globalize.js'],
+    output: ['psvmjs.c']
+)
 
 psvmjs_inc = include_directories('include')
-psvmjs_lib = library('psvmjs', sources: [psvmjs_ct], include_directories: psvmjs_inc)
+psvmjs_lib = library('psvmjs', sources: [psvmjs_c_ct], include_directories: psvmjs_inc)
 
 psvmjs_dep = declare_dependency(
     include_directories: psvmjs_inc,
