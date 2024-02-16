@@ -12,9 +12,11 @@ qjsc_exe = quickjs_proj.get_variable('qjsc_exe')
 psvmjs_ct = custom_target('psvmjs_build',
     depends: qjsc_exe,
     input: 'meson_wrapper.py',
-    command: [python_exe, '@INPUT@', '@CURRENT_SOURCE_DIR@', '@OUTDIR@', qjsc_exe.full_path()],
+    command: [python_exe, '@INPUT@'],
     output: ['psvmjs.c'],
 )
+
+run_command([qjsc_exe, '-c', '-o', meson.current_build_dir() + '/psvmjs.c', meson.current_source_dir() + '/js_src/dist/globalize.js', meson.current_source_dir() + '/js_src/dist/psvm.js'])
 
 
 
