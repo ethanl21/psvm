@@ -1,7 +1,7 @@
 [wrap-git]
-url = https://github.com/frida/quickjs.git
-revision = d2c302c54069cbd070a01162ca022cbc716b655c
+url = https://github.com/bellard/quickjs.git
+revision = c06af876f6d44488bad3c3e1e5f479edb36f8bf5
 depth = 1
 
-diff_files = quickjs/msvc.diff
 patch_directory = quickjs/overlay
+diff_files = quickjs/version_conflict.diff

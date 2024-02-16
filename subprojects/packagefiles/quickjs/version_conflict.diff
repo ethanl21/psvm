@@ -1,0 +1,33 @@
+diff --git a/Makefile b/Makefile
+index fc59a4f..30ed9d5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -125,7 +125,7 @@ CFLAGS+=-fwrapv # ensure that signed overflows behave as expected
+ ifdef CONFIG_WERROR
+ CFLAGS+=-Werror
+ endif
+-DEFINES:=-D_GNU_SOURCE -DCONFIG_VERSION=\"$(shell cat VERSION)\"
++DEFINES:=-D_GNU_SOURCE -DCONFIG_VERSION=\"$(shell cat VERSION.txt)\"
+ ifdef CONFIG_BIGNUM
+ DEFINES+=-DCONFIG_BIGNUM
+ endif
+diff --git a/VERSION b/VERSION
+deleted file mode 100644
+index e32e065..0000000
+--- a/VERSION
++++ /dev/null
+@@ -1 +0,0 @@
+-2024-02-14
+diff --git a/release.sh b/release.sh
+index cc74ab2..f6cdb04 100755
+--- a/release.sh
++++ b/release.sh
+@@ -3,7 +3,7 @@
+ 
+ set -e
+ 
+-version=`cat VERSION`
++version=`cat VERSION.txt`
+ 
+ if [ "$1" = "-h" ] ; then
+     echo "release.sh [release_list]"
