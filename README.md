@@ -18,7 +18,7 @@ engine that supports native C++ modules. An example Godot 4 integration is plann
 
 ## Building
 
-To build PSVM, Node.js and Meson are required.
+To build PSVM, Node.js and Meson are required. When compiling for Windows, MSVC is not supported.
 
 ### Instructions
 
@@ -57,7 +57,7 @@ Then you can link to PSVM in your `build.meson` file.
 
 ```
 psvm_proj = subproject('psvm')
-psvm_dep = stduuid_proj.get_variable('psvm_dep')
+psvm_dep = dependency('psvm')
 
 executable('my_program', sources: ['...'], dependencies: ['psvm_dep'])
 ```
@@ -68,6 +68,8 @@ PSVM uses [pkmn/ps](https://github.com/pkmn/ps) (a modular version
 of [smogon/pokemon-showdown](https://github.com/smogon/pokemon-showdown)) to simulate battles. Both are distributed
 under the MIT license.
 
-[frida/quickjs](https://github.com/frida/quickjs) is distributed under the MIT license.
+[bellard/quickjs](https://github.com/bellard/quickjs) is distributed under the MIT license.
+
+[mariusbancila/stduuid](https://github.com/mariusbancila/stduuid) is distributed under the MIT license.
 
 PSVM itself is distributed under the MIT license.
