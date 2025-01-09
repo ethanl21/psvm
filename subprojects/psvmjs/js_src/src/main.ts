@@ -39,6 +39,7 @@ export class ShowdownService {
     void (async (id) => {
       for await (const chunk of streams.omniscient) {
         // todo: add callback fn wrapper as a member of this class instead of a global fn
+        // @ts-expect-error ts(2304)
         ResponseCallback(id, chunk);
       }
     })(id);
@@ -80,3 +81,6 @@ export class ShowdownService {
     }
   }
 }
+
+// @ts-expect-error ts(7017)
+globalThis.showdownService = ShowdownService;

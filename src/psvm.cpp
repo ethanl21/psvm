@@ -39,7 +39,6 @@ public:
 
         // Add ShowdownService class to global namespace
         qjs::js_std_eval_binary(this->ctx_, psvmjs::qjsc_psvm, psvmjs::qjsc_psvm_size, 0);
-        qjs::js_std_eval_binary(this->ctx_, psvmjs::qjsc_globalize, psvmjs::qjsc_globalize_size, 0);
 
         const qjs::JSValue showdownServiceCtor =
                 qjs::JS_GetPropertyStr(this->ctx_, this->js_globalThis, "ShowdownService");
