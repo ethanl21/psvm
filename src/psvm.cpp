@@ -13,8 +13,10 @@ namespace psvmjs {
 }
 
 namespace qjs {
+    extern "C"{
 #include "quickjs-libc.h"
 #include "quickjs.h"
+    }
 } // namespace qjs
 };
 

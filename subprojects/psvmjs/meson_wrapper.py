@@ -4,7 +4,11 @@ from pathlib import Path
 import sys
 
 def main():
-    npm_path = shutil.which("npm")
+    # Find pnpm or npm
+    npm_path = shutil.which("pnpm")
+    if npm_path is None:
+        npm_path = shutil.which("npm")
+    
     psvmjs_src_dir = (Path(sys.argv[1]) / "js_src").resolve()
 
     # Bundle the JS project

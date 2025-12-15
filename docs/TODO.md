@@ -2,7 +2,7 @@
 
 ## Build
 
-- [x] Replace c-smile/quickjspp with frida/quickjs
+- [x] Replace c-smile/quickjspp with quickjs-ng/quickjs
 - [x] Migrate CMake build process to Meson
 - [x] Build macOS universal (arm64 + x86) binary
 

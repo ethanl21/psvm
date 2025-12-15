@@ -3,12 +3,12 @@
 .idea
 
 # Meson Wrap dependencies
-subprojects/quickjs
-subprojects/stduuid-*
-subprojects/packagecache
+subprojects/*/
+!subprojects/psvmjs
 
 # Meson build output
 builddir
 
 # psvmjs bytecode
+psvm.raw.c
 psvmjs.c
