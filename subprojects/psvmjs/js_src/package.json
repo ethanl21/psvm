@@ -3,17 +3,9 @@
   "version": "2.0.0",
   "description": "",
   "type": "module",
-  "source": "src/main.ts",
-  "main": "dist/psvm.cjs",
-  "module": "dist/psvm.mjs",
-  "unpkg": "dist/psvm.umd.js",
-  "exports": {
-    "require": "./dist/psvm.cjs",
-    "import": "./dist/psvm.mjs"
-  },
   "scripts": {
-    "build": "microbundle",
-    "dev": "microbundle watch",
+    "build": "NODE_ENV=production node scripts/esbuild.mjs",
+    "build:dev": "NODE_ENV=development node scripts/esbuild.mjs",
     "lint": "eslint ./src",
     "format": "prettier --write ./src"
   },
@@ -21,20 +13,20 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@types/node": "^22.10.5",
-    "@typescript-eslint/eslint-plugin": "^8.19.1",
-    "@typescript-eslint/parser": "^8.19.1",
-    "eslint": "^9.17.0",
-    "eslint-config-prettier": "^9.1.0",
-    "microbundle": "^0.15.1",
-    "prettier": "3.4.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.19.1"
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^25.0.2",
+    "esbuild": "^0.27.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "jiti": "^2.6.1",
+    "prettier": "3.7.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.49.0"
   },
   "dependencies": {
-    "@pkmn/randoms": "^0.9.26",
-    "@pkmn/sim": "^0.9.26",
+    "@pkmn/randoms": "^0.10.3",
+    "@pkmn/sim": "^0.10.3",
     "@pkmn/streams": "^1.1.0"
   }
 }

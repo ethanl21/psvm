@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <psvm/psvm.hpp>
+#include <uuid.h>
 
 const std::vector<std::string> SIM_TEST_LINES = {
     R"(>start {"formatid":"gen9customgame"})",
@@ -9,22 +10,33 @@ const std::vector<std::string> SIM_TEST_LINES = {
 };
 
 int main() {
-    // Create a new ShowdownService
-    ShowdownService ss;
+    try {
+        // Create the service
+        psvm::ShowdownService service;
 
-    // Demo callback function, prints to stdout
-    const std::function<void(std::string, std::string)> callback = [](const std::string &id, const std::string &msg) {
-        std::cout << "[" << id << "]\n"
-                << msg << "\n";
-    };
-    ss.setSimulatorOnResponseCallback(callback);
+        service.setCallback([](const std::string &id, const std::string &chunk) {
+            std::cout << "Battle " << id << ": " << chunk << "\n";
+        });
 
-    // Create a battle and store its id
-    const auto battle_id = ss.CreateBattle();
+        // Start a battle
+        uuids::uuid const battle_id = uuids::uuid_system_generator{}();
+        std::string const battle_id_str = uuids::to_string(battle_id);
+        service.startBattle(battle_id_str);
 
-    // Write all the test lines to the battle stream
-    for (const auto &line: SIM_TEST_LINES) {
-        ss.WriteMessage(battle_id, line);
+        // Send some messages to the battle
+        for(const auto& line : SIM_TEST_LINES) {
+            service.writeToBattle(battle_id_str, line);
+        }
+
+        // Kill the battle
+        service.killBattle(battle_id_str);
+        // Optional: kill all active battles
+        service.killAllBattles();
+
+        std::cout << "Battle simulation completed successfully.\n";
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
     }
 
     return 0;

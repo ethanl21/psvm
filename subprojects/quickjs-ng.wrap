@@ -1,0 +1,11 @@
+[wrap-file]
+directory = quickjs-0.11.0
+source_url = https://github.com/quickjs-ng/quickjs/archive/refs/tags/v0.11.0.tar.gz
+source_filename = quickjs-ng-0.11.0.tar.gz
+source_hash = b456e6aa05522eed9cbf9dec1e947ba1ba6578fd09386391e581339ddabaa641
+source_fallback_url = https://github.com/mesonbuild/wrapdb/releases/download/quickjs-ng_0.11.0-1/quickjs-ng-0.11.0.tar.gz
+wrapdb_version = 0.11.0-1
+
+[provide]
+dependency_names = quickjs-ng
+program_names = qjsc, qjs

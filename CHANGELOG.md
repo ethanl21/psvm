@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file. The format 
 
 ## [Unreleased]
 
+## [3.0.0] - 2025-12-15
+
+- Update eslint, Prettier
+- Move back to esbuild instead of microbundle
+- Rewrite ShowdownService (c++ and ts)
+- Remove documentation generator
+- Use quickjs-ng instead of frida/quickjs
+- Update QuickJS, stduuid
+- Remove stduuid usage in library
+
 ## [2.0.0] - 2025-01-08
 
 - Update eslint, Prettier
