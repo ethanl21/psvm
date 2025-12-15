@@ -12,3 +12,6 @@ builddir
 # psvmjs bytecode
 psvm.raw.c
 psvmjs.c
+
+# documentation output
+docs/_build
