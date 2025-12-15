@@ -1,83 +1,89 @@
-/**
- * @file psvm.hpp
- * @brief Defines the ShowdownSimulator class used to simulate Pokemon battles.
- */
-#ifndef PSVM_HPP
-#define PSVM_HPP
+#pragma once
 
-#include <cstring> // std::strlen
-#include <functional> // std::function
-#include <memory> // std::unique_ptr
-#include <optional> // std::optional
-#include <random> // std::random_device, std::mt19937, std::uniform_int_distribution
-#include <sstream> // std::stringstream
-#include <string> // std::string
+#include <functional>
+#include <memory>
+#include <string>
+#include <iostream>
+#include <vector>
 
-/**
- * @brief Manages Pokémon Showdown battle streams running in an embedded JavaScript context.
- */
-class ShowdownService {
-public:
-    /**
-     * @brief Creates a new simulator JS context
-     */
-    ShowdownService();
+namespace psvm {
 
     /**
-     * @brief Frees the simulator JS context
+     * @brief Interface for managing Pokémon Showdown battle streams.
+     *
+     * This class wraps a QuickJS runtime internally to run JS simulations of battles.
+     * QuickJS types are fully hidden from the user.
      */
-    ~ShowdownService();
+    class ShowdownService {
+    public:
+        /**
+         * @brief Construct a new ShowdownService instance.
+         *
+         * Creates a new QuickJS runtime and context, evaluates the embedded JS
+         * bytecode, and sets up the battle service instance.
+         */
+        ShowdownService();
 
-    /**
-     * @brief Creates a new battle stream
-     * @return UUID used to identify the new battle, or "-1" if error
-     */
-    std::string CreateBattle() const;
+        /**
+         * @brief Destroy the ShowdownService instance.
+         *
+         * Frees all QuickJS objects, context, and runtime.
+         */
+        ~ShowdownService();
 
-    /**
-     * @brief Kills a battle stream if it exists
-     * @param id UUID of the battle stream to kill
-     */
-    void DeleteBattle(const std::string &id) const;
+        /**
+         * @brief Set a user-defined callback for receiving battle output.
+         *
+         * @param cb A function that takes the battle ID and a string chunk from
+         * the battle stream.
+         *
+         * This callback will be called whenever the JS ShowdownService writes
+         * output to a battle stream.
+         */
+        void setCallback(std::function<void(const std::string &id, const std::string &chunk)> cb);
 
-    /**
-     * @brief Kills all the active battle streams
-     */
-    void DeleteAllBattles() const;
+        /**
+         * @brief Write a message to a battle stream.
+         *
+         * @param id The battle ID to send the message to.
+         * @param message The message to send.
+         *
+         * If the battle stream exists, the message will be written and the
+         * QuickJS event loop will be run to process the message.
+         */
+        void writeToBattle(const std::string &id, const std::string &message);
 
-    /**
-     * @brief Writes a line to a battle stream
-     * @param id ID of the battle to write to
-     * @param message Line to write to the battle stream. '\\n' will be appended to the end of the
-     * string if it is missing.
-     */
-    void WriteMessage(const std::string &id, const std::string &message) const;
+        /**
+         * @brief Start a new battle simulation.
+         *
+         * @param id The unique battle ID.
+         *
+         * If a battle with the given ID exists, it will be overwritten.
+         * Starts reading the output asynchronously and forwards it to the
+         * user callback.
+         */
+        void startBattle(const std::string &id);
 
-    /**
-     * @brief Sets the simulator message response callback
-     * @param simulatorOnRespCallback a function that will be called whenever the simulator produces
-     * output
-     */
-    void setSimulatorOnResponseCallback(const std::function<void(std::string, std::string)> &simulatorOnRespCallback);
+        /**
+         * @brief Kill a battle simulation.
+         *
+         * @param id The battle ID to kill.
+         *
+         * Deletes the corresponding battle stream if it exists.
+         */
+        void killBattle(const std::string &id);
 
-    /**
-     * @brief Clears the simulator message response callback
-     */
-    void clearSimulatorOnResponseCallback();
+        /**
+         * @brief Kill all active battles.
+         *
+         * Clears all active battle streams and stops their output.
+         */
+        void killAllBattles();
 
-private:
-    /// \cond HIDDEN_SYMBOLS
-    // pImpl used so the end user doesn't have to link QuickJS
-    class impl;
-
-    std::unique_ptr<impl> pimpl;
-
-    /// \endcond
-
-    /**
-     * @brief Callback function to call when a battle stream produces output
-     */
-    std::optional<std::function<void(std::string, std::string)>> on_msg_received_callback_;
+    private:
+        // Pimpl idiom: full definition hidden in .cpp
+        struct Impl;
+        std::unique_ptr<Impl> pimpl_;
 };
 
-#endif
+} // namespace psvm

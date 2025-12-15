@@ -1,46 +1,41 @@
 import { BattleStreams } from "@pkmn/sim";
 import { ObjectReadWriteStream } from "@pkmn/streams";
 
-//declare function ResponseCallback(id: string, chunk: string): undefined;
-
-/**
- * @file main.ts
- *
- * @brief JavaScript implementation of psvm used to simulate battles
- */
-
 /**
  * ShowdownService
- * @brief Manages Pokémon Showdown BattleStream objects to simulate battles
+ * Manages Pokémon Showdown BattleStream objects to simulate battles.
  */
-export class ShowdownService {
-  battle_dict: Map<string, ObjectReadWriteStream<string>>;
+class ShowdownService {
+  private battleDict: Map<string, ObjectReadWriteStream<string>>;
 
   constructor() {
-    this.battle_dict = new Map();
+    this.battleDict = new Map();
   }
 
   /**
-   * @brief Starts a new battle
+   * Start a new battle.
+   * @param id UUID of the battle
    */
-  startBattle(id: string) {
-    // Delete the battle stream if it already exists
-    this.battle_dict.delete(id);
+  startBattle(id: string): string {
+    // Delete if already exists
+    this.battleDict.delete(id);
 
     // Create the battle streams
     const streams = BattleStreams.getPlayerStreams(
       new BattleStreams.BattleStream(),
     );
 
-    // Add the omniscient stream to the streams dict
-    this.battle_dict.set(id, streams.omniscient);
+    // Store the omniscient stream
+    this.battleDict.set(id, streams.omniscient);
 
-    // Write the output to the output function
-    void (async (id) => {
+    // Write each chunk to the global ResponseCallback
+    void (async (battleId: string) => {
       for await (const chunk of streams.omniscient) {
-        // todo: add callback fn wrapper as a member of this class instead of a global fn
-        // @ts-expect-error ts(2304)
-        ResponseCallback(id, chunk);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (typeof (globalThis as any).ResponseCallback === "function") {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (globalThis as any).ResponseCallback(battleId, chunk);
+        }
       }
     })(id);
 
@@ -48,39 +43,35 @@ export class ShowdownService {
   }
 
   /**
-   * @brief Kill a battle
-   * @param id UUID of the battle to kill
-   */
-  killBattle(id: string) {
-    // delete the battle from the dict
-    this.battle_dict.delete(id);
-  }
-
-  /**
-   * @brief Kill all the currently active battles
-   */
-  killAllBattles() {
-    this.battle_dict.clear();
-  }
-
-  /**
-   * @brief Write a message to a battle stream if it exists
+   * Kill a specific battle
    * @param id UUID of the battle
-   * @param message Message to write to the battle stream
    */
-  writeToBattle(id: string, message: string) {
-    const battleStream = this.battle_dict.get(id);
+  killBattle(id: string): void {
+    this.battleDict.delete(id);
+  }
 
-    if (battleStream) {
-      let msgCopy = message.slice();
-      if (!msgCopy.endsWith("\n")) {
-        msgCopy += "\n";
-      }
+  /**
+   * Kill all active battles
+   */
+  killAllBattles(): void {
+    this.battleDict.clear();
+  }
 
-      battleStream.write(msgCopy);
-    }
+  /**
+   * Write a message to a battle
+   * @param id UUID of the battle
+   * @param message message to write
+   */
+  writeToBattle(id: string, message: string): void {
+    const battleStream = this.battleDict.get(id);
+    if (!battleStream) return;
+
+    let msgCopy = message;
+    if (!msgCopy.endsWith("\n")) msgCopy += "\n";
+    battleStream.write(msgCopy);
   }
 }
 
-// @ts-expect-error ts(7017)
-globalThis.showdownService = ShowdownService;
+// Expose globally for C++ QuickJS bindings
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(globalThis as any).showdownService = ShowdownService;
