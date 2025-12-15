@@ -42,6 +42,8 @@ A compiled test driver executable will be located at `builddir/psvm_test_driver`
 
 ## Usage
 
+An example program is located at [test/test_driver.cpp](test/test_driver.cpp).
+
 To use PSVM in a Meson project, add `psvm.wrap` to the `subprojects` directory in your project's root with the following contents:
 
 ```
