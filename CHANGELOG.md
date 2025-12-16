@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. The format 
 
 ## [Unreleased]
 
+## [3.0.2] - 2025-12-15
+
+## Added
+
+- cross-env
+
 ## [3.0.1] - 2025-12-15
 
 ## Removed
