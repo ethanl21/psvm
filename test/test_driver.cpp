@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <psvm/psvm.hpp>
-#include <uuid.h>
 
 const std::vector<std::string> SIM_TEST_LINES = {
     R"(>start {"formatid":"gen9customgame"})",
@@ -19,9 +18,8 @@ int main() {
         });
 
         // Start a battle
-        uuids::uuid const battle_id = uuids::uuid_system_generator{}();
-        std::string const battle_id_str = uuids::to_string(battle_id);
-        service.startBattle(battle_id_str);
+        std::string const battle_id_str = "battle_0";
+        service.startBattle (battle_id_str);
 
         // Send some messages to the battle
         for(const auto& line : SIM_TEST_LINES) {
